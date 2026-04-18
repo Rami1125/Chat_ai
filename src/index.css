@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-bg-main: #f0f2f5;
+  --color-sidebar-bg: #ffffff;
+  --color-accent: #6366f1;
+  --color-accent-light: #eef2ff;
+  --color-text-dark: #1e293b;
+  --color-text-muted: #64748b;
+  --color-border-color: #e2e8f0;
+}
+
+@layer base {
+  body {
+    @apply font-sans antialiased bg-bg-main text-text-dark selection:bg-accent/20;
+  }
+}
+
+@layer components {
+  .prose {
+    @apply leading-relaxed text-zinc-800;
+  }
+  .prose p {
+    @apply mb-4 last:mb-0;
+  }
+  .prose strong {
+    @apply font-bold text-black;
+  }
+  .prose h1, .prose h2, .prose h3 {
+    @apply font-bold text-black mt-6 mb-2;
+  }
+  .prose ul {
+    @apply list-disc space-y-1 mb-4 ps-5;
+  }
+  .prose ol {
+    @apply list-decimal space-y-1 mb-4 ps-5;
+  }
+  .prose li {
+    @apply mb-1 leading-normal;
+  }
+  /* Ensure RTL support for lists */
+  [dir="rtl"] .prose ul, [dir="rtl"] .prose ol {
+    @apply pr-5 pl-0;
+  }
+  .prose code {
+    @apply rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-accent;
+  }
+  .prose pre {
+    @apply mt-4 mb-4 overflow-x-auto rounded-xl bg-slate-900 p-5 font-mono text-[0.85em] leading-relaxed text-slate-100 shadow-inner;
+  }
+  .prose pre code {
+    @apply bg-transparent p-0 text-slate-100;
+  }
+  .prose blockquote {
+    @apply border-l-4 border-zinc-200 pl-4 italic text-zinc-600 my-4;
+  }
+  .prose-invert code {
+    @apply bg-white/20 text-white;
+  }
+  .prose-invert blockquote {
+    @apply border-white/20 text-indigo-100;
+  }
+
+  .chat-dot-bg {
+    background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+  }
+  
+  .user-bubble-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  }
+}
