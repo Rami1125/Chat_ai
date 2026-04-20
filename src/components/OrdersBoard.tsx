@@ -99,22 +99,9 @@ export const OrdersBoard = () => {
 סידור עבודה Aura AI 🤖`;
   };
 
-  const handleShare = async (round: any) => {
+  const handleWhatsAppShare = (round: any) => {
     const text = generateShareText(round);
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `הזמנה עבור ${round.customer}`,
-          text: text,
-        });
-      } catch (err) {
-        // Fallback to WhatsApp if share fails or cancelled
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-      }
-    } else {
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const filteredRounds = useMemo(() => {
@@ -473,11 +460,11 @@ export const OrdersBoard = () => {
                             <td className="px-8 py-5 text-left">
                               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button 
-                                  onClick={() => handleShare(round)}
-                                  className="p-2 hover:bg-white hover:shadow-md border border-transparent hover:border-zinc-100 rounded-xl text-zinc-400 hover:text-emerald-600 transition-all"
-                                  title="שתף הזמנה"
+                                  onClick={() => handleWhatsAppShare(round)}
+                                  className="p-2 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 rounded-xl text-emerald-600 transition-all"
+                                  title="שתף בוואטסאפ"
                                 >
-                                  <Share2 size={16} />
+                                  <MessageCircle size={16} />
                                 </button>
                                 <button className="p-2 hover:bg-white hover:shadow-md border border-transparent hover:border-zinc-100 rounded-xl text-zinc-400 hover:text-accent transition-all">
                                   <Edit2 size={16} />
@@ -564,10 +551,10 @@ export const OrdersBoard = () => {
                         <Phone size={14} />
                       </button>
                       <button 
-                        onClick={() => handleShare(round)}
+                        onClick={() => handleWhatsAppShare(round)}
                         className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-all active:scale-90"
                       >
-                        <Share2 size={14} />
+                        <MessageCircle size={14} />
                       </button>
                     </div>
                   </div>
