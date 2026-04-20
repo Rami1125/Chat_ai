@@ -463,22 +463,30 @@ export default function App() {
         <SidebarContent />
       </aside>
 
-      {/* Sidebar - Mobile Drawer */}
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.aside
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 bottom-0 right-0 w-72 bg-sidebar-bg border-l border-border-color flex flex-col z-[50] md:hidden shadow-2xl"
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="fixed inset-0 bg-sidebar-bg flex flex-col z-[60] md:hidden shadow-2xl overflow-hidden"
           >
-            <div className="absolute left-0 top-1/2 -translate-x-full p-2" onClick={() => setIsSidebarOpen(false)}>
-               <div className="bg-white p-2 rounded-r-lg shadow-lg border-y border-r border-border-color">
-                  <X size={20} className="text-text-muted" />
+            <div className="flex items-center justify-between p-6 border-b border-border-color shrink-0">
+               <div className="flex items-center gap-2">
+                 <div className="w-8 h-8 rounded-full user-bubble-gradient flex items-center justify-center text-white font-bold text-xs ring-2 ring-accent/20">A</div>
+                 <span className="font-black text-sm tracking-tighter">תפריט Aura</span>
                </div>
+               <button 
+                 onClick={() => setIsSidebarOpen(false)}
+                 className="p-3 bg-zinc-50 border border-zinc-100 rounded-2xl text-text-muted hover:text-accent transition-all active:scale-90"
+               >
+                 <X size={24} />
+               </button>
             </div>
-            <SidebarContent />
+            <div className="flex-1 overflow-y-auto">
+              <SidebarContent />
+            </div>
           </motion.aside>
         )}
       </AnimatePresence>

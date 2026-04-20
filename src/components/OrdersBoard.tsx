@@ -86,6 +86,37 @@ export const OrdersBoard = () => {
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
   const [selectedOrderForMap, setSelectedOrderForMap] = useState<any>(null);
 
+  const generateShareText = (round: any) => {
+    return `📦 *פרטי הזמנה - ח. סבן*
+👤 *לקוח:* ${round.customer}
+📍 *יעד:* ${round.destination}
+🚛 *נהג:* ${round.driver}
+⏰ *זמן:* ${round.time}
+🏗️ *מחסן:* ${round.warehouse}
+📝 *סחורה:* ${round.items}
+🔄 *סטטוס:* ${round.status}
+
+סידור עבודה Aura AI 🤖`;
+  };
+
+  const handleShare = async (round: any) => {
+    const text = generateShareText(round);
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `הזמנה עבור ${round.customer}`,
+          text: text,
+        });
+      } catch (err) {
+        // Fallback to WhatsApp if share fails or cancelled
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+      }
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+  };
+
   const filteredRounds = useMemo(() => {
     return rounds.filter(round => {
       const matchesSearch = 
@@ -118,38 +149,38 @@ export const OrdersBoard = () => {
   return (
     <div className="flex flex-col h-full bg-[#f8fafc] text-[#1e293b] font-sans overflow-hidden" dir="rtl">
       {/* Top Header - Global Tools */}
-      <header className="bg-white border-b border-zinc-200 px-8 py-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-accent rounded-2xl flex items-center justify-center text-white shadow-lg shadow-accent/20">
-            <TrendingUp size={24} />
+      <header className="bg-white border-b border-zinc-200 px-4 md:px-8 py-3 md:py-4 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-accent rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-lg shadow-accent/20 shrink-0">
+            <TrendingUp size={20} className="md:w-6 md:h-6" />
           </div>
-          <div>
-            <h1 className="text-2xl font-black tracking-tighter">לוח זמנים והפצה</h1>
-            <div className="flex items-center gap-2 text-xs font-bold text-zinc-400">
+          <div className="min-w-0">
+            <h1 className="text-lg md:text-2xl font-black tracking-tighter truncate">לוח הפצה</h1>
+            <div className="hidden sm:flex items-center gap-2 text-[10px] md:text-xs font-bold text-zinc-400">
               <Clock size={12} />
-              <span>עדכון אחרון: {new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}</span>
-              <span className="w-1 h-1 bg-zinc-300 rounded-full" />
-              <span>{filteredRounds.length} הזמנות מוצגות</span>
+              <span className="truncate">עדכון: {new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}</span>
+              <span className="w-1 h-1 bg-zinc-300 rounded-full shrink-0" />
+              <span>{filteredRounds.length} פריטים</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-bold hover:bg-zinc-50 transition-all shadow-sm">
+        <div className="flex items-center gap-2 md:gap-3">
+          <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-bold hover:bg-zinc-50 transition-all shadow-sm">
             <Share2 size={16} className="text-accent" />
-            <span>שתף דוח בוקר</span>
+            <span>שתף דוח</span>
           </button>
-          <button className="flex items-center gap-2 px-5 py-2.5 bg-accent text-white rounded-xl text-xs font-black shadow-lg shadow-accent/30 hover:bg-accent-dark transition-all active:scale-95">
+          <button className="flex items-center gap-2 px-3 md:px-5 py-2 md:py-2.5 bg-accent text-white rounded-xl text-xs font-black shadow-lg shadow-accent/30 hover:bg-accent-dark transition-all active:scale-95 shrink-0">
             <Plus size={18} />
-            <span>הזמנה חדשה</span>
+            <span className="hidden xs:inline">הזמנה חדשה</span>
           </button>
         </div>
       </header>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Right Sidebar - Stats & Tools */}
-        <aside className="w-80 border-l border-zinc-200 bg-white overflow-y-auto p-6 space-y-8 shrink-0">
+      <div className="flex-1 flex overflow-hidden lg:flex-row flex-col">
+        {/* Right Sidebar - Stats & Tools (Hidden on Mobile) */}
+        <aside className="hidden lg:flex w-80 border-l border-zinc-200 bg-white overflow-y-auto p-6 space-y-8 shrink-0">
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-50/50 p-4 rounded-3xl border border-blue-100">
@@ -225,7 +256,27 @@ export const OrdersBoard = () => {
         </aside>
 
         {/* Central Dashboard Grid */}
-        <main className="flex-1 p-8 overflow-y-auto space-y-6">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto space-y-6">
+          {/* Mobile Quick Stats (Visible only on mobile) */}
+          <div className="lg:hidden flex gap-2 overflow-x-auto no-scrollbar pb-2">
+            {[
+              { label: 'בדרך', count: stats.inTransit, color: 'blue' },
+              { label: 'בוצע', count: stats.completed, color: 'emerald' },
+              { label: 'ממתין', count: stats.pending, color: 'amber' },
+              { label: 'נהגים', count: stats.activeDrivers, color: 'purple' }
+            ].map(stat => (
+              <div key={stat.label} className={cn("px-4 py-2 rounded-2xl border shrink-0 flex items-center gap-2", 
+                stat.color === 'blue' ? "bg-blue-50 border-blue-100 text-blue-700" :
+                stat.color === 'emerald' ? "bg-emerald-50 border-emerald-100 text-emerald-700" :
+                stat.color === 'amber' ? "bg-amber-50 border-amber-100 text-amber-700" :
+                "bg-purple-50 border-purple-100 text-purple-700"
+              )}>
+                <span className="text-[10px] font-black uppercase tracking-wider">{stat.label}</span>
+                <span className="font-black text-sm">{stat.count}</span>
+              </div>
+            ))}
+          </div>
+
           {/* Critical Alerts Banner Hub */}
           <div className="flex gap-4 overflow-hidden">
             <motion.div 
@@ -271,25 +322,25 @@ export const OrdersBoard = () => {
           </div>
 
           {/* Controls & Filter Bar */}
-          <div className="bg-white p-5 rounded-[2.5rem] border border-zinc-200 shadow-sm space-y-4">
-            <div className="flex flex-col md:flex-row gap-4">
+          <div className="bg-white p-4 md:p-5 rounded-3xl md:rounded-[2.5rem] border border-zinc-200 shadow-sm space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="relative flex-1 group">
                 <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-accent transition-colors" />
                 <input 
                   type="text"
-                  placeholder="חיפוש מהיר של לקוח, נהג, כתובת או מוצרים..."
+                  placeholder="חיפוש לקוח, נהג, כתובת..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl py-3 pr-12 pl-4 text-sm outline-none focus:ring-4 focus:ring-accent/10 focus:bg-white transition-all font-medium"
                 />
               </div>
               
-              <div className="flex gap-2 shrink-0">
-                <div className="relative">
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 shrink-0">
+                <div className="relative col-span-1">
                   <select 
                     value={driverFilter}
                     onChange={(e) => setDriverFilter(e.target.value)}
-                    className="appearance-none bg-zinc-50 border border-zinc-100 rounded-2xl py-3 pr-4 pl-10 text-xs font-black outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer hover:bg-white transition-all min-w-[140px]"
+                    className="w-full appearance-none bg-zinc-50 border border-zinc-100 rounded-2xl py-3 pr-4 pl-10 text-xs font-black outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer hover:bg-white transition-all sm:min-w-[120px]"
                   >
                     <option value="all">כל הנהגים</option>
                     <option value="חכמת">חכמת</option>
@@ -298,27 +349,11 @@ export const OrdersBoard = () => {
                   <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
                 </div>
 
-                <div className="relative">
-                  <select 
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="appearance-none bg-zinc-50 border border-zinc-100 rounded-2xl py-3 pr-4 pl-10 text-xs font-black outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer hover:bg-white transition-all min-w-[140px]"
-                  >
-                    <option value="all">כל הסטטוסים</option>
-                    <option value="בהכנה">בהכנה</option>
-                    <option value="מוכנה">מוכנה</option>
-                    <option value="העמסה">העמסה</option>
-                    <option value="בדרך">בדרך</option>
-                    <option value="בוצע">בוצע</option>
-                  </select>
-                  <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
-                </div>
-
-                <div className="relative">
+                <div className="relative col-span-1">
                   <select 
                     value={warehouseFilter}
                     onChange={(e) => setWarehouseFilter(e.target.value)}
-                    className="appearance-none bg-zinc-50 border border-zinc-100 rounded-2xl py-3 pr-4 pl-10 text-xs font-black outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer hover:bg-white transition-all min-w-[140px]"
+                    className="w-full appearance-none bg-zinc-50 border border-zinc-100 rounded-2xl py-3 pr-4 pl-10 text-xs font-black outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer hover:bg-white transition-all sm:min-w-[120px]"
                   >
                     <option value="all">כל המחסנים</option>
                     <option value="החרש">החרש</option>
@@ -326,305 +361,223 @@ export const OrdersBoard = () => {
                   </select>
                   <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
                 </div>
-              </div>
-            </div>
+                
+                <div className="relative col-span-2 sm:col-auto">
+                    <button className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-2xl text-[10px] font-black uppercase tracking-wider hover:bg-zinc-100 transition-all">
+                        <span className="flex items-center gap-2">
+                           <Calendar size={14} className="text-accent" />
+                           {startDate ? `${startDate} - ${endDate}` : 'כל התאריכים'}
+                        </span>
+                        <ChevronDown size={14} className="text-zinc-400" />
+                    </button>
+                </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-50 pt-4">
-               <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <div className="flex items-center gap-2 text-xs font-black text-zinc-400 shrink-0">
-                     <Calendar size={14} />
-                     <span>תאריכי אספקה:</span>
-                  </div>
-                  <div className="flex items-center gap-2 flex-1">
-                     <input 
-                       type="date"
-                       value={startDate}
-                       onChange={(e) => setStartDate(e.target.value)}
-                       className="bg-zinc-50 border border-zinc-100 rounded-xl py-2 px-4 text-xs font-bold outline-none focus:ring-4 focus:ring-accent/10 flex-1 hover:bg-white"
-                     />
-                     <span className="text-zinc-300 font-bold">~</span>
-                     <input 
-                       type="date"
-                       value={endDate}
-                       onChange={(e) => setEndDate(e.target.value)}
-                       className="bg-zinc-50 border border-zinc-100 rounded-xl py-2 px-4 text-xs font-bold outline-none focus:ring-4 focus:ring-accent/10 flex-1 hover:bg-white"
-                     />
-                  </div>
-               </div>
-
-               <div className="flex items-center gap-2">
-                 {(search || driverFilter !== 'all' || statusFilter !== 'all' || warehouseFilter !== 'all' || startDate || endDate) && (
-                   <button 
-                     onClick={() => {
-                        setSearch('');
-                        setDriverFilter('all');
-                        setStatusFilter('all');
-                        setWarehouseFilter('all');
-                        setStartDate('');
-                        setEndDate('');
-                     }}
-                     className="text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors flex items-center gap-1"
-                   >
-                     <X size={14} />
-                     נקה הכל
-                   </button>
-                 )}
-                 <div className="h-6 w-px bg-zinc-200 mx-2" />
-                 <button className="p-2 hover:bg-zinc-50 rounded-xl text-zinc-400 transition-colors">
-                    <Box size={18} />
-                 </button>
-                 <button 
+                <button 
                   onClick={() => setIsColorModalOpen(true)}
-                  className="p-2 hover:bg-zinc-50 rounded-xl text-zinc-400 hover:text-accent transition-colors"
-                  title="התאמת צבעים"
-                 >
-                    <Palette size={18} />
-                 </button>
-               </div>
+                  className="col-span-2 sm:col-auto flex items-center justify-center gap-2 px-4 py-3 bg-white border border-zinc-200 rounded-2xl text-[10px] font-black uppercase tracking-wider hover:bg-zinc-50 transition-all text-accent"
+                >
+                  <Palette size={14} />
+                  <span>צבעי סטטוס</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Color Customization Modal */}
-          <AnimatePresence>
-            {isColorModalOpen && (
-              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Orders Display - Responsive Table/Cards */}
+          <div className="space-y-4">
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-[2.5rem] border border-zinc-200 shadow-xl shadow-zinc-200/50 overflow-hidden">
+              <div className="overflow-x-auto overflow-y-auto max-h-[600px] no-scrollbar">
+                <table className="w-full text-right border-collapse">
+                  <thead className="sticky top-0 bg-white z-10 border-b-2 border-zinc-50">
+                    <tr className="text-[10px] font-black text-zinc-400 tracking-[0.2em] uppercase">
+                      <th className="px-8 py-6">תעדוף</th>
+                      <th className="px-6 py-6 text-center">זמן ונהג</th>
+                      <th className="px-6 py-6">לקוח ויעד</th>
+                      <th className="px-6 py-6">פירוט סחורה</th>
+                      <th className="px-6 py-6">סטטוס</th>
+                      <th className="px-8 py-6"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-50">
+                    <AnimatePresence mode="popLayout">
+                      {filteredRounds.length > 0 ? (
+                        filteredRounds.map((round, idx) => (
+                          <motion.tr 
+                            layout
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.98 }}
+                            transition={{ delay: 0.03 * idx }}
+                            key={round.id}
+                            className="hover:bg-zinc-50/70 transition-all group"
+                          >
+                            <td className="px-8 py-5">
+                              <div className={cn(
+                                "w-2 h-8 rounded-full",
+                                round.priority === 'high' ? "bg-rose-500 shadow-lg shadow-rose-200" :
+                                round.priority === 'medium' ? "bg-amber-400 shadow-lg shadow-amber-200" : "bg-blue-400 shadow-lg shadow-blue-200"
+                              )} />
+                            </td>
+                            <td className="px-6 py-5">
+                              <div className="flex flex-col items-center gap-1">
+                                <span className="text-sm font-black text-[#1e293b]">{round.time}</span>
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100 rounded-full">
+                                  <span className="text-[9px] font-bold text-zinc-500">{round.driver}</span>
+                                  {round.status === 'בדרך' && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />}
+                                  {round.priority === 'high' && round.status !== 'בוצע' && (
+                                    <AlertCircle size={10} className="text-rose-500 animate-pulse" />
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-5 min-w-[180px]">
+                              <div className="flex items-center gap-2 mb-1">
+                                  <p className="text-sm font-black">{round.customer}</p>
+                                  <span className="text-[9px] px-1.5 py-0.5 bg-zinc-100 text-zinc-500 rounded font-bold uppercase tracking-tighter">
+                                      מחסן {round.warehouse}
+                                  </span>
+                              </div>
+                              <div className="flex items-center gap-1 text-[11px] text-zinc-400 font-bold group/loc cursor-pointer hover:text-accent transition-colors" onClick={() => setSelectedOrderForMap(round)}>
+                                <MapPin size={10} className="text-accent" />
+                                <span className="border-b border-dotted border-zinc-200 group-hover/loc:border-accent">
+                                  {round.destination}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-5">
+                              <p className="text-[11px] font-bold text-zinc-500 leading-relaxed max-w-[200px]">
+                                {round.items}
+                              </p>
+                            </td>
+                            <td className="px-6 py-5">
+                              <div className="flex flex-col gap-2">
+                                <span className={cn(
+                                  "px-3 py-1.5 rounded-2xl text-[10px] font-black border text-center transition-all",
+                                  getStatusColor(round.status)
+                                )}>
+                                  {round.status}
+                                </span>
+                                <div className="w-full bg-zinc-100 h-1 rounded-full overflow-hidden">
+                                  <motion.div 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: round.status === 'בוצע' ? '100%' : round.status === 'בדרך' ? '70%' : round.status === 'העמסה' ? '30%' : '10%' }}
+                                    className={cn(
+                                      "h-full",
+                                      round.status === 'בוצע' ? "bg-emerald-500" : "bg-accent"
+                                    )}
+                                  />
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-8 py-5 text-left">
+                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button 
+                                  onClick={() => handleShare(round)}
+                                  className="p-2 hover:bg-white hover:shadow-md border border-transparent hover:border-zinc-100 rounded-xl text-zinc-400 hover:text-emerald-600 transition-all"
+                                  title="שתף הזמנה"
+                                >
+                                  <Share2 size={16} />
+                                </button>
+                                <button className="p-2 hover:bg-white hover:shadow-md border border-transparent hover:border-zinc-100 rounded-xl text-zinc-400 hover:text-accent transition-all">
+                                  <Edit2 size={16} />
+                                </button>
+                                <button className="p-2 hover:bg-white hover:shadow-md border border-transparent hover:border-zinc-100 rounded-xl text-zinc-400 hover:text-zinc-600 transition-all">
+                                  <MoreVertical size={16} />
+                                </button>
+                              </div>
+                            </td>
+                          </motion.tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="px-8 py-24 text-center">
+                            <div className="flex flex-col items-center gap-4 opacity-40">
+                              <Box size={48} className="text-zinc-300" />
+                              <p className="text-lg font-black text-zinc-500">אין הזמנות תואמות לסינון</p>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </AnimatePresence>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {filteredRounds.map((round) => (
                 <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setIsColorModalOpen(false)}
-                  className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-                />
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                  animate={{ scale: 1, opacity: 1, y: 0 }}
-                  exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                  className="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl border border-zinc-200 p-8 overflow-hidden"
+                  key={round.id}
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white rounded-3xl border border-zinc-200 p-5 shadow-sm space-y-4 relative overflow-hidden"
                 >
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center text-accent">
-                        <Palette size={20} />
+                  {/* Status Accent Strip */}
+                  <div className={cn("absolute top-0 right-0 bottom-0 w-1.5", 
+                    round.status === 'בדרך' ? 'bg-blue-500' : 
+                    round.status === 'בוצע' ? 'bg-emerald-500' : 'bg-amber-500'
+                  )} />
+
+                  <div className="flex items-start justify-between">
+                    <div className="flex gap-3">
+                      <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-zinc-100">
+                        {round.driver === 'חכמת' ? '🏗️' : '🚛'}
                       </div>
-                      <h3 className="text-xl font-black tracking-tight">התאמת צבעי סטטוס</h3>
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-black truncate">{round.customer}</h3>
+                        <p className="text-[10px] font-bold text-zinc-400 italic">#{round.id} • {round.time}</p>
+                      </div>
                     </div>
-                    <button 
-                      onClick={() => setIsColorModalOpen(false)}
-                      className="p-2 hover:bg-zinc-100 rounded-xl text-zinc-400 transition-all"
-                    >
-                      <X size={20} />
-                    </button>
+                    <div className={cn("px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border", getStatusColor(round.status))}>
+                      {round.status}
+                    </div>
                   </div>
 
-                  <div className="space-y-6">
-                    {Object.keys(statusColors).map(status => (
-                      <div key={status} className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-bold text-zinc-700">{status}</span>
-                          <span className={cn(
-                            "px-3 py-1 rounded-full text-[10px] font-black border transition-all",
-                            getStatusColor(status)
-                          )}>
-                             תצוגה מקדימה
-                          </span>
-                        </div>
-                        <div className="flex gap-2 justify-between bg-zinc-50 p-3 rounded-2xl border border-zinc-100">
-                          {availableColors.map(color => (
-                            <button
-                              key={color}
-                              onClick={() => setStatusColors(prev => ({ ...prev, [status]: color }))}
-                              className={cn(
-                                "w-6 h-6 rounded-full transition-all border-2",
-                                statusColors[status] === color ? "border-accent scale-110 shadow-md shadow-accent/20" : "border-white hover:scale-110"
-                              )}
-                              style={{ 
-                                backgroundColor: 
-                                  color === 'blue' ? '#3b82f6' : 
-                                  color === 'emerald' ? '#10b981' : 
-                                  color === 'amber' ? '#f59e0b' : 
-                                  color === 'purple' ? '#a855f7' : 
-                                  color === 'zinc' ? '#71717a' : 
-                                  color === 'rose' ? '#f43f5e' : '#0ea5e9' 
-                              }}
-                            />
-                          ))}
-                        </div>
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2 text-xs font-bold text-zinc-600 font-sans">
+                      <MapPin size={14} className="text-accent shrink-0" />
+                      <button 
+                        onClick={() => setSelectedOrderForMap(round)}
+                        className="text-right border-b border-dotted border-zinc-300 transition-colors active:text-accent"
+                      >
+                        {round.destination}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-bold text-zinc-600 bg-zinc-50 p-2.5 rounded-xl border border-zinc-100">
+                      <Package size={14} className="text-zinc-400 shrink-0" />
+                      <span className="truncate">{round.items}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-zinc-100">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center text-[10px] font-black text-accent">
+                        {round.warehouse[0]}
                       </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-10">
-                    <button 
-                      onClick={() => setIsColorModalOpen(false)}
-                      className="w-full py-4 bg-zinc-900 text-white rounded-2xl font-black text-sm shadow-xl shadow-zinc-200 hover:bg-zinc-800 transition-all active:scale-[0.98]"
-                    >
-                      שמור שינויים
-                    </button>
+                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">מחסן {round.warehouse}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all active:scale-90">
+                        <Phone size={14} />
+                      </button>
+                      <button 
+                        onClick={() => handleShare(round)}
+                        className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-all active:scale-90"
+                      >
+                        <Share2 size={14} />
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
-
-          {/* Orders Table Container */}
-          <div className="bg-white rounded-[2.5rem] border border-zinc-200 shadow-xl shadow-zinc-200/50 overflow-hidden">
-            <div className="overflow-x-auto overflow-y-auto max-h-[600px] no-scrollbar">
-              <table className="w-full text-right border-collapse">
-                <thead className="sticky top-0 bg-white z-10 border-b-2 border-zinc-50">
-                  <tr className="text-[10px] font-black text-zinc-400 tracking-[0.2em] uppercase">
-                    <th className="px-8 py-6">תעדוף</th>
-                    <th className="px-6 py-6 text-center">זמן ונהג</th>
-                    <th className="px-6 py-6">לקוח ויעד</th>
-                    <th className="px-6 py-6">פירוט סחורה</th>
-                    <th className="px-6 py-6">סטטוס</th>
-                    <th className="px-8 py-6"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-50">
-                  <AnimatePresence mode="popLayout">
-                    {filteredRounds.length > 0 ? (
-                      filteredRounds.map((round, idx) => (
-                        <motion.tr 
-                          layout
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.98 }}
-                          transition={{ delay: 0.03 * idx }}
-                          key={round.id}
-                          className="hover:bg-zinc-50/70 transition-all group"
-                        >
-                          <td className="px-8 py-5">
-                            <div className={cn(
-                              "w-2 h-8 rounded-full",
-                              round.priority === 'high' ? "bg-rose-500 shadow-lg shadow-rose-200" :
-                              round.priority === 'medium' ? "bg-amber-400 shadow-lg shadow-amber-200" : "bg-blue-400 shadow-lg shadow-blue-200"
-                            )} />
-                          </td>
-                          <td className="px-6 py-5">
-                            <div className="flex flex-col items-center gap-1">
-                              <span className="text-sm font-black text-[#1e293b]">{round.time}</span>
-                              <div className="flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100 rounded-full">
-                                <span className="text-[9px] font-bold text-zinc-500">{round.driver}</span>
-                                {round.status === 'בדרך' && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />}
-                                {round.priority === 'high' && round.status !== 'בוצע' && (
-                                  <AlertCircle size={10} className="text-rose-500 animate-pulse" />
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 min-w-[180px]">
-                            <div className="flex items-center gap-2 mb-1">
-                                <p className="text-sm font-black">{round.customer}</p>
-                                <span className="text-[9px] px-1.5 py-0.5 bg-zinc-100 text-zinc-500 rounded font-bold uppercase tracking-tighter">
-                                    מחסן {round.warehouse}
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-1 text-[11px] text-zinc-400 font-bold group/loc cursor-pointer hover:text-accent transition-colors" onClick={() => setSelectedOrderForMap(round)}>
-                              <MapPin size={10} className="text-accent" />
-                              <span className="border-b border-dotted border-zinc-200 group-hover/loc:border-accent">
-                                {round.destination}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5">
-                            <p className="text-[11px] font-bold text-zinc-500 leading-relaxed max-w-[200px]">
-                              {round.items}
-                            </p>
-                          </td>
-                          <td className="px-6 py-5">
-                            <div className="flex flex-col gap-2">
-                              <span className={cn(
-                                "px-3 py-1.5 rounded-2xl text-[10px] font-black border text-center transition-all",
-                                getStatusColor(round.status)
-                              )}>
-                                {round.status}
-                              </span>
-                              <div className="w-full bg-zinc-100 h-1 rounded-full overflow-hidden">
-                                <motion.div 
-                                  initial={{ width: 0 }}
-                                  animate={{ width: round.status === 'בוצע' ? '100%' : round.status === 'בדרך' ? '70%' : round.status === 'העמסה' ? '30%' : '10%' }}
-                                  className={cn(
-                                    "h-full",
-                                    round.status === 'בוצע' ? "bg-emerald-500" : "bg-accent"
-                                  )}
-                                />
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-8 py-5 text-left">
-                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button className="p-2 hover:bg-white hover:shadow-md border border-transparent hover:border-zinc-100 rounded-xl text-zinc-400 hover:text-accent transition-all">
-                                <Edit2 size={16} />
-                              </button>
-                              <button className="p-2 hover:bg-white hover:shadow-md border border-transparent hover:border-zinc-100 rounded-xl text-zinc-400 hover:text-emerald-500 transition-all">
-                                <CheckCircle2 size={16} />
-                              </button>
-                              <button className="p-2 hover:bg-white hover:shadow-md border border-transparent hover:border-zinc-100 rounded-xl text-zinc-400 hover:text-zinc-600 transition-all">
-                                <MoreVertical size={16} />
-                              </button>
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={6} className="px-8 py-24 text-center">
-                          <div className="flex flex-col items-center gap-4 opacity-40">
-                            <Box size={48} className="text-zinc-300" />
-                            <div>
-                               <p className="text-lg font-black text-zinc-500">אין הזמנות תואמות לסינון</p>
-                               <p className="text-sm font-bold text-zinc-400">נסה לשנות את טווח התאריכים או הנהג</p>
-                            </div>
-                            <button 
-                              onClick={() => {
-                                 setSearch('');
-                                 setDriverFilter('all');
-                                 setStatusFilter('all');
-                                 setWarehouseFilter('all');
-                                 setStartDate('');
-                                 setEndDate('');
-                              }}
-                              className="px-6 py-2 bg-zinc-100 hover:bg-zinc-200 rounded-xl text-xs font-black transition-all"
-                            >
-                              אפס את כל המערכת
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </AnimatePresence>
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Table Footer */}
-            <div className="bg-zinc-50 p-6 border-t border-zinc-100 flex items-center justify-between">
-               <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
-                     <span className="w-2 h-2 rounded-full bg-rose-500 shadow-sm" />
-                     <span className="text-[10px] font-bold text-zinc-500">עדיפות גבוהה</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                     <span className="w-2 h-2 rounded-full bg-amber-400 shadow-sm" />
-                     <span className="text-[10px] font-bold text-zinc-500">עדיפות בינונית</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                     <span className="w-2 h-2 rounded-full bg-blue-400 shadow-sm" />
-                     <span className="text-[10px] font-bold text-zinc-500">עדיפות נמוכה</span>
-                  </div>
-               </div>
-               
-               <div className="flex items-center gap-4 text-[10px] font-black text-zinc-400 uppercase tracking-widest">
-                  <span>עמוד 1 מתוך 4</span>
-                  <div className="flex gap-2">
-                     <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-zinc-200 hover:bg-zinc-50 disabled:opacity-30" disabled>
-                        <ChevronDown size={14} className="rotate-90" />
-                     </button>
-                     <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-zinc-200 hover:bg-zinc-50">
-                        <ChevronDown size={14} className="-rotate-90" />
-                     </button>
-                  </div>
-               </div>
+              ))}
+              {filteredRounds.length === 0 && (
+                <div className="text-center py-20 bg-zinc-50 rounded-[3rem] border border-dashed border-zinc-200">
+                  <p className="text-zinc-400 font-bold">לא נמצאו הזמנות</p>
+                </div>
+              )}
             </div>
           </div>
         </main>

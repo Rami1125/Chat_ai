@@ -20,7 +20,7 @@ export default defineConfig(({mode}) => {
           name: 'Aura AI - לוגיסטיקה ח. סבן',
           short_name: 'Aura ח. סבן',
           description: 'המוח הלוגיסטי של ח. סבן חומרי בניין. ניהול לוח ההזמנות, הפצה לוואטסאפ וסנכרון נהגים.',
-          theme_color: '#f97316',
+          theme_color: '#6366f1',
           start_url: '/',
           display: 'standalone',
           background_color: '#ffffff',
