@@ -3,6 +3,17 @@ import { motion, AnimatePresence } from 'motion/react';
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { 
+  collection, 
+  query, 
+  onSnapshot, 
+  addDoc, 
+  updateDoc, 
+  doc, 
+  serverTimestamp,
+  orderBy
+} from 'firebase/firestore';
+import { db, handleFirestoreError } from '../lib/firebase';
+import { 
   Truck, 
   Users, 
   Package, 
@@ -47,12 +58,33 @@ const RecenterMap = ({ coords }: { coords: { lat: number; lng: number } }) => {
 };
 
 export const OrdersBoard = () => {
-  const [rounds, setRounds] = useState([
-    { id: 1, date: '2026-04-18', time: '07:30', driver: 'חכמת', vehicle: 'מנוף 🏗️', warehouse: 'החרש', customer: 'זבולון-עדירן', destination: 'אתר אשקלון', coords: { lat: 31.6667, lng: 34.5667 }, status: 'בדרך', items: 'בטון ב-30 (7 קוב), ברזל 12"', priority: 'high' },
-    { id: 2, date: '2026-04-18', time: '08:00', driver: 'עלי', vehicle: 'משאית 🚛', warehouse: 'התלמיד', customer: 'סביון', destination: 'גן יבנה', coords: { lat: 31.8105, lng: 34.7175 }, status: 'העמסה', items: 'ריצופית (50 שק), דבק שיש', priority: 'medium' },
-    { id: 3, date: '2026-04-18', time: '09:15', driver: 'חכמת', vehicle: 'מנוף 🏗️', warehouse: 'החרש', customer: 'פרץ בוני הנגב', destination: 'באר שבע', coords: { lat: 31.2518, lng: 34.7913 }, status: 'מוכנה', items: 'איטום גגות, פלטות גבס', priority: 'high' },
-  ]);
+  const [rounds, setRounds] = useState<any[]>([]);
+  const [isSyncing, setIsSyncing] = useState(false);
 
+  // Real-time Firebase Sync logic
+  useEffect(() => {
+    setIsSyncing(true);
+    const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const ordersData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setRounds(ordersData);
+      setIsSyncing(false);
+      
+      // Also update local cache for lightning-fast subsequent loads
+      localStorage.setItem('sabanos_orders_cache', JSON.stringify(ordersData));
+    }, (error) => {
+      handleFirestoreError(error, 'list', 'orders');
+      setIsSyncing(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Sync logic for color configuration
   const [statusColors, setStatusColors] = useState<Record<string, string>>({
     'בדרך': 'blue',
     'בוצע': 'emerald',
@@ -87,7 +119,7 @@ export const OrdersBoard = () => {
   const [selectedOrderForMap, setSelectedOrderForMap] = useState<any>(null);
 
   const generateShareText = (round: any) => {
-    return `📦 *פרטי הזמנה - ח. סבן*
+    return `📦 *SabanOS - פרטי הזמנה*
 👤 *לקוח:* ${round.customer}
 📍 *יעד:* ${round.destination}
 🚛 *נהג:* ${round.driver}
@@ -96,7 +128,7 @@ export const OrdersBoard = () => {
 📝 *סחורה:* ${round.items}
 🔄 *סטטוס:* ${round.status}
 
-סידור עבודה Aura AI 🤖`;
+הופק ע"י נועה AI 🤖`;
   };
 
   const handleWhatsAppShare = (round: any) => {
@@ -133,6 +165,36 @@ export const OrdersBoard = () => {
     activeDrivers: new Set(rounds.map(r => r.driver)).size,
   }), [rounds]);
 
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    try {
+      await updateDoc(doc(db, 'orders', orderId), {
+        status: newStatus,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      handleFirestoreError(error, 'update', `orders/${orderId}`);
+    }
+  };
+
+  const createDummyOrder = async () => {
+    try {
+      await addDoc(collection(db, 'orders'), {
+        customer: 'לקוח חדש',
+        destination: 'אתר בנייה',
+        driver: 'עלי',
+        items: 'חומרי איטום',
+        status: 'בהכנה',
+        warehouse: 'החרש',
+        priority: 'medium',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        coords: { lat: 31.6667, lng: 34.5667 }
+      });
+    } catch (error) {
+      handleFirestoreError(error, 'create', 'orders');
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-[#f8fafc] text-[#1e293b] font-sans overflow-hidden" dir="rtl">
       {/* Top Header - Global Tools */}
@@ -142,12 +204,18 @@ export const OrdersBoard = () => {
             <TrendingUp size={20} className="md:w-6 md:h-6" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg md:text-2xl font-black tracking-tighter truncate">לוח הפצה</h1>
+            <h1 className="text-lg md:text-2xl font-black tracking-tighter truncate">SabanOS - לוח הפצה</h1>
             <div className="hidden sm:flex items-center gap-2 text-[10px] md:text-xs font-bold text-zinc-400">
               <Clock size={12} />
               <span className="truncate">עדכון: {new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}</span>
               <span className="w-1 h-1 bg-zinc-300 rounded-full shrink-0" />
               <span>{filteredRounds.length} פריטים</span>
+              {isSyncing && (
+                <>
+                  <span className="w-1 h-1 bg-zinc-300 rounded-full shrink-0" />
+                  <span className="text-accent animate-pulse">סנכרון פעיל...</span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -157,7 +225,10 @@ export const OrdersBoard = () => {
             <Share2 size={16} className="text-accent" />
             <span>שתף דוח</span>
           </button>
-          <button className="flex items-center gap-2 px-3 md:px-5 py-2 md:py-2.5 bg-accent text-white rounded-xl text-xs font-black shadow-lg shadow-accent/30 hover:bg-accent-dark transition-all active:scale-95 shrink-0">
+          <button 
+            onClick={createDummyOrder}
+            className="flex items-center gap-2 px-3 md:px-5 py-2 md:py-2.5 bg-accent text-white rounded-xl text-xs font-black shadow-lg shadow-accent/30 hover:bg-accent-dark transition-all active:scale-95 shrink-0"
+          >
             <Plus size={18} />
             <span className="hidden xs:inline">הזמנה חדשה</span>
           </button>
@@ -439,12 +510,19 @@ export const OrdersBoard = () => {
                             </td>
                             <td className="px-6 py-5">
                               <div className="flex flex-col gap-2">
-                                <span className={cn(
-                                  "px-3 py-1.5 rounded-2xl text-[10px] font-black border text-center transition-all",
-                                  getStatusColor(round.status)
-                                )}>
+                                <button 
+                                  onClick={() => {
+                                    const statuses = ['בהכנה', 'מוכנה', 'העמסה', 'בדרך', 'בוצע'];
+                                    const nextIdx = (statuses.indexOf(round.status) + 1) % statuses.length;
+                                    updateOrderStatus(round.id, statuses[nextIdx]);
+                                  }}
+                                  className={cn(
+                                    "px-3 py-1.5 rounded-2xl text-[10px] font-black border text-center transition-all hover:brightness-95 active:scale-95",
+                                    getStatusColor(round.status)
+                                  )}
+                                >
                                   {round.status}
-                                </span>
+                                </button>
                                 <div className="w-full bg-zinc-100 h-1 rounded-full overflow-hidden">
                                   <motion.div 
                                     initial={{ width: 0 }}
@@ -518,9 +596,16 @@ export const OrdersBoard = () => {
                         <p className="text-[10px] font-bold text-zinc-400 italic">#{round.id} • {round.time}</p>
                       </div>
                     </div>
-                    <div className={cn("px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border", getStatusColor(round.status))}>
+                    <button 
+                      onClick={() => {
+                        const statuses = ['בהכנה', 'מוכנה', 'העמסה', 'בדרך', 'בוצע'];
+                        const nextIdx = (statuses.indexOf(round.status) + 1) % statuses.length;
+                        updateOrderStatus(round.id, statuses[nextIdx]);
+                      }}
+                      className={cn("px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all active:scale-95", getStatusColor(round.status))}
+                    >
                       {round.status}
-                    </div>
+                    </button>
                   </div>
 
                   <div className="space-y-2.5">

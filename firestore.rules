@@ -1,0 +1,98 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Default Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- PRIMITIVES & HELPERS ---
+    function isSignedIn() { return request.auth != null; }
+    function isVerified() { return isSignedIn() && request.auth.token.email_verified == true; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    // --- VALIDATION HELPERS ---
+    
+    function isValidCustomer(data) {
+      return data.keys().hasAll(['id', 'name']) 
+        && data.id is string && data.id.size() <= 64
+        && data.name is string && data.name.size() <= 100
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 20))
+        && (!('address' in data) || (data.address is string && data.address.size() <= 255));
+    }
+
+    function isValidOrder(data) {
+      return data.keys().hasAll(['id', 'customerId', 'status'])
+        && data.id is string && data.id.size() <= 64
+        && data.customerId is string && data.customerId.size() <= 64
+        && data.status in ['בהכנה', 'מוכנה', 'העמסה', 'בדרך', 'בוצע']
+        && (!('customerName' in data) || (data.customerName is string && data.customerName.size() <= 100))
+        && (!('destination' in data) || (data.destination is string && data.destination.size() <= 255))
+        && (!('items' in data) || (data.items is string && data.items.size() <= 1000))
+        && (!('driver' in data) || (data.driver is string && data.driver.size() <= 50))
+        && (!('priority' in data) || (data.priority in ['low', 'medium', 'high']))
+        && (!('createdAt' in data) || (data.createdAt is timestamp))
+        && (!('updatedAt' in data) || (data.updatedAt is timestamp));
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['id', 'conversationId', 'role', 'content'])
+        && data.id is string && data.id.size() <= 64
+        && data.conversationId is string && data.conversationId.size() <= 64
+        && data.role in ['user', 'model']
+        && data.content is string && data.content.size() <= 10000;
+    }
+
+    // --- COLLECTION RULES ---
+
+    // Customers
+    match /customers/{customerId} {
+      allow read: if isVerified();
+      allow create: if isVerified() && isValidId(customerId) && isValidCustomer(incoming());
+      allow update: if isVerified() && isValidCustomer(incoming()) 
+        && incoming().id == existing().id;
+      allow delete: if false; // Archive instead
+    }
+
+    // Orders
+    match /orders/{orderId} {
+      allow read: if isVerified();
+      allow create: if isVerified() && isValidId(orderId) && isValidOrder(incoming())
+        && incoming().createdAt == request.time;
+      allow update: if isVerified() && isValidOrder(incoming())
+        && incoming().id == existing().id
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          // Allow any update for now as long as it's signed in, but we could restrict fields
+          incoming().diff(existing()).affectedKeys().hasAny(['status', 'driver', 'items', 'destination', 'updatedAt'])
+        );
+      allow delete: if isVerified(); // Allow deletion for demo purposes, usually restricted
+      
+      // Delivery Logs
+      match /delivery_logs/{logId} {
+        allow read: if isVerfied();
+        allow create: if isVerified() && isValidId(logId);
+      }
+    }
+
+    // Conversations & Messages
+    match /conversations/{conversationId} {
+      allow read, write: if isVerified(); // Simplification: any verified user for now
+      
+      match /messages/{messageId} {
+        allow read: if isVerified();
+        allow create: if isVerified() && isValidId(messageId) && isValidMessage(incoming());
+      }
+    }
+    
+    // User Profiles
+    match /users/{userId} {
+      allow read: if isVerified();
+      allow write: if isVerified() && isOwner(userId);
+    }
+  }
+}

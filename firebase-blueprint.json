@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "customer": {
+      "title": "Customer",
+      "description": "Details about a customer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name"]
+    },
+    "order": {
+      "title": "Order",
+      "description": "Details about a specific order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "destination": { "type": "string" },
+        "items": { "type": "string" },
+        "driver": { "type": "string" },
+        "time": { "type": "string" },
+        "status": { "type": "string", "enum": ["בהכנה", "מוכנה", "העמסה", "בדרך", "בוצע"] },
+        "warehouse": { "type": "string", "enum": ["החרש", "התלמיד"] },
+        "priority": { "type": "string", "enum": ["low", "medium", "high"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "customerId", "status"]
+    },
+    "delivery_log": {
+      "title": "Delivery Log",
+      "description": "Logs for order status updates and delivery events",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "orderId": { "type": "string" },
+        "status": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "orderId", "status", "timestamp"]
+    },
+    "message": {
+      "title": "Message",
+      "description": "Chat message for AI assistant",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "conversationId": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "model"] },
+        "content": { "type": "string" },
+        "attachments": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "conversationId", "role", "content"]
+    }
+  },
+  "firestore": {
+    "/customers/{customerId}": {
+      "schema": "customer",
+      "description": "Collection of customers"
+    },
+    "/orders/{orderId}": {
+      "schema": "order",
+      "description": "Collection of orders"
+    },
+    "/orders/{orderId}/delivery_logs/{logId}": {
+      "schema": "delivery_log",
+      "description": "Subcollection of logs for a specific order"
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": "message",
+      "description": "Messages for a chat conversation"
+    }
+  }
+}

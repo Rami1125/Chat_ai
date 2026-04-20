@@ -7,6 +7,9 @@ import { SettingsModal } from './components/SettingsModal';
 import { OrdersBoard } from './components/OrdersBoard';
 import { ReloadPrompt } from './components/ReloadPrompt';
 import { cn } from './lib/utils';
+import { auth, db } from './lib/firebase';
+import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { 
   Orbit, 
   RotateCcw, 
@@ -30,6 +33,7 @@ import { ChatConversation } from './types';
 
 export default function App() {
   const [view, setView] = useState<'chat' | 'orders'>('chat');
+  const [user, setUser] = useState<any>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
@@ -62,6 +66,15 @@ export default function App() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    // Firebase Auth
+    onAuthStateChanged(auth, (u) => {
+      if (u) {
+        setUser(u);
+      } else {
+        signInAnonymously(auth).catch(e => console.error("Auth error", e));
+      }
+    });
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -146,11 +159,25 @@ export default function App() {
     if (window.innerWidth < 768) setIsSidebarOpen(false);
 
     try {
+      // Fetch recent orders for AI context
+      let orderContext = "";
+      try {
+        const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(10));
+        const snapshot = await getDocs(q);
+        const orders = snapshot.docs.map(d => d.data());
+        if (orders.length > 0) {
+          orderContext = "\n\nנתוני לוח הזמנים העדכניים (SabanOS):\n" + 
+            orders.map(o => `- לקוח: ${o.customer}, נהג: ${o.driver}, סטטוס: ${o.status}, סחורה: ${o.items}`).join('\n');
+        }
+      } catch (e) {
+        console.warn("Could not fetch order context for AI", e);
+      }
+
       const history = messages; 
       let assistantContent = "";
       let hasPlayedSound = false;
       
-      const stream = sendMessageStream(history, content, personality, attachments);
+      const stream = sendMessageStream(history, content + orderContext, personality, attachments);
       
       setMessages(prev => [...prev, { role: 'model', content: '' }]);
 
@@ -272,7 +299,7 @@ export default function App() {
           className={`w-full flex items-center gap-3 p-3 rounded-xl font-bold transition-all ${view === 'chat' ? 'bg-accent text-white shadow-lg' : 'bg-transparent text-text-muted hover:bg-accent-light hover:text-accent'}`}
         >
           <MessageSquareText size={20} />
-          <span>צ'אט Aura</span>
+          <span>נועה (צ'אט)</span>
         </button>
         <button 
           onClick={() => {
@@ -512,12 +539,12 @@ export default function App() {
               </div>
               <div>
                 <h2 className="text-[14px] md:text-[16px] font-bold m-0 leading-tight truncate max-w-[120px] md:max-w-none">
-                    {view === 'chat' ? 'עוזר AI אישי' : 'לוח הזמנות פעיל'}
+                    {view === 'chat' ? 'נועה - עוזרת AI' : 'לוח זמנים SabanOS'}
                 </h2>
                 <div className="flex items-center gap-1.5 leading-none mt-0.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span className="text-[10px] md:text-[12px] text-emerald-600 font-medium">
-                      {view === 'chat' ? 'זמין' : 'סנכרון חי פעיל'}
+                      {view === 'chat' ? 'זמינה' : 'סנכרון מאגרים חי'}
                   </span>
                 </div>
               </div>
@@ -554,10 +581,10 @@ export default function App() {
             {view === 'chat' ? (
                 <motion.div 
                     key="chat"
-                    initial={{ opacity: 0, x: 10 }}
+                    initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
                     ref={scrollRef}
                     className="h-full overflow-y-auto scroll-smooth chat-dot-bg p-8 flex flex-col"
                 >
@@ -572,9 +599,9 @@ export default function App() {
                         <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-border-color">
                             <Orbit className="h-8 w-8 text-accent" />
                         </div>
-                        <h2 className="text-3xl font-bold tracking-tight mb-3 text-text-dark tracking-tighter">Aura - מוח לוגיסטי</h2>
+                        <h2 className="text-3xl font-bold tracking-tight mb-3 text-text-dark tracking-tighter">נועה - SabanOS</h2>
                         <p className="text-text-muted max-w-sm mb-8 leading-relaxed">
-                            אהלן שותף, אני Aura. כאן כדי לנהל את ההזמנות וההפצה של ח. סבן. מה הסידור להיום אחי?
+                            שלום, אני נועה. המוח מאחורי מערכת SabanOS. אני כאן כדי לעזור לך לנהל את הלקוחות, ההזמנות והלוגיסטיקה בצורה החכמה ביותר.
                         </p>
                         
                         <div className="flex flex-wrap justify-center gap-2 max-w-lg">
@@ -638,10 +665,10 @@ export default function App() {
             ) : (
                 <motion.div 
                     key="orders"
-                    initial={{ opacity: 0, x: 10 }}
+                    initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
                     className="h-full w-full"
                 >
                     <OrdersBoard />
