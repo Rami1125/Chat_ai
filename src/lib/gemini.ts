@@ -12,7 +12,7 @@ const ai = new GoogleGenAI({
   apiKey: getApiKey()
 });
 
-export const model = "gemini-2.0-flash-exp";
+export const model = "gemini-3-flash-preview";
 
 export interface Personality {
   persona: 'friendly' | 'professional' | 'humorous' | 'sarcastic' | 'enthusiastic' | 'concise';

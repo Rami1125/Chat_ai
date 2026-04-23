@@ -50,19 +50,19 @@ service cloud.firestore {
 
     // Customers
     match /customers/{customerId} {
-      allow read: if isVerified();
-      allow create: if isVerified() && isValidId(customerId) && isValidCustomer(incoming());
-      allow update: if isVerified() && isValidCustomer(incoming()) 
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(customerId) && isValidCustomer(incoming());
+      allow update: if isSignedIn() && isValidCustomer(incoming()) 
         && incoming().id == existing().id;
       allow delete: if false; // Archive instead
     }
 
     // Orders
     match /orders/{orderId} {
-      allow read: if isVerified();
-      allow create: if isVerified() && isValidId(orderId) && isValidOrder(incoming())
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(orderId) && isValidOrder(incoming())
         && incoming().createdAt == request.time;
-      allow update: if isVerified() && isValidOrder(incoming())
+      allow update: if isSignedIn() && isValidOrder(incoming())
         && incoming().id == existing().id
         && incoming().createdAt == existing().createdAt
         && incoming().updatedAt == request.time
@@ -70,29 +70,29 @@ service cloud.firestore {
           // Allow any update for now as long as it's signed in, but we could restrict fields
           incoming().diff(existing()).affectedKeys().hasAny(['status', 'driver', 'items', 'destination', 'updatedAt'])
         );
-      allow delete: if isVerified(); // Allow deletion for demo purposes, usually restricted
+      allow delete: if isSignedIn(); // Allow deletion for demo purposes, usually restricted
       
       // Delivery Logs
       match /delivery_logs/{logId} {
-        allow read: if isVerfied();
-        allow create: if isVerified() && isValidId(logId);
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && isValidId(logId);
       }
     }
 
     // Conversations & Messages
     match /conversations/{conversationId} {
-      allow read, write: if isVerified(); // Simplification: any verified user for now
+      allow read, write: if isSignedIn(); // Simplification: any signed in user for now
       
       match /messages/{messageId} {
-        allow read: if isVerified();
-        allow create: if isVerified() && isValidId(messageId) && isValidMessage(incoming());
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && isValidId(messageId) && isValidMessage(incoming());
       }
     }
     
     // User Profiles
     match /users/{userId} {
-      allow read: if isVerified();
-      allow write: if isVerified() && isOwner(userId);
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && isOwner(userId);
     }
   }
 }

@@ -343,13 +343,13 @@ export default function App() {
       <div className="flex-1 overflow-hidden p-4 space-y-4">
         {view === 'chat' ? (
           <>
-            <button 
+            <div 
               onClick={createNewChat}
-              className="w-full flex items-center justify-center gap-2 p-3 bg-zinc-50 text-text-muted border border-dashed border-border-color rounded-lg font-semibold hover:bg-accent-light hover:text-accent hover:border-accent transition-all group mb-2"
+              className="w-full flex items-center justify-center gap-2 p-3 bg-zinc-50 text-text-muted border border-dashed border-border-color rounded-lg font-semibold hover:bg-accent-light hover:text-accent hover:border-accent transition-all cursor-pointer group mb-2"
             >
               <Plus size={18} />
               <span>שיחה חדשה</span>
-            </button>
+            </div>
             
             <div className="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar min-h-0">
               {['active', 'archived'].map((status) => {
@@ -358,10 +358,10 @@ export default function App() {
 
                 return (
                   <div key={status} className="space-y-1">
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest px-2 mb-2 opacity-50 flex items-center justify-between">
+                    <div className="text-[10px] text-text-muted font-bold uppercase tracking-widest px-2 mb-2 opacity-50 flex items-center justify-between">
                       <span>{status === 'active' ? 'שיחות פעילות' : 'ארכיון'}</span>
                       <span className="bg-bg-main px-1.5 py-0.5 rounded text-[8px]">{filtered.length}</span>
-                    </p>
+                    </div>
                     {filtered.length === 0 && status === 'active' ? (
                       <div className="px-2 py-4 text-center">
                         <p className="text-xs text-text-muted italic">אין שיחות פעילות</p>
@@ -386,7 +386,7 @@ export default function App() {
                               </button>
                             </div>
                           ) : (
-                            <button
+                            <div
                               onClick={() => selectConversation(conv.id)}
                               className={`group w-full flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all text-right ${currentConversationId === conv.id ? 'bg-accent/10 text-accent font-bold ring-1 ring-inset ring-accent/30' : 'hover:bg-bg-main text-text-muted font-medium'}`}
                             >
@@ -422,7 +422,7 @@ export default function App() {
                                   <Trash2 size={12} />
                                 </button>
                               </div>
-                            </button>
+                            </div>
                           )}
                         </div>
                       ))
