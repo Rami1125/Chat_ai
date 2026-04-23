@@ -12,7 +12,7 @@ const ai = new GoogleGenAI({
   apiKey: getApiKey()
 });
 
-export const model = "gemini-3-flash-preview";
+export const model = "gemini-2.0-flash-exp";
 
 export interface Personality {
   persona: 'friendly' | 'professional' | 'humorous' | 'sarcastic' | 'enthusiastic' | 'concise';
@@ -124,10 +124,11 @@ export async function* sendMessageStream(
     }
   } catch (error: any) {
     console.error("Gemini stream error:", error);
-    if (error.message?.includes('API_KEY_INVALID')) {
-      yield "Error: Invalid API Key. Please check your Gemini API key in settings.";
+    const errorMsg = error.message || "";
+    if (errorMsg.includes('API_KEY_INVALID') || errorMsg.includes('API key expired')) {
+      yield "Error: המפתח (API Key) של Gemini פג תוקף או שגוי. אנא רענן את המפתח בהגדרות (Secrets) של הפרויקט.";
     } else {
-      throw error;
+      yield "Error: חלה שגיאה בתקשורת עם Aura AI. אנא נסה שוב מאוחר יותר.";
     }
   }
 }

@@ -15,7 +15,7 @@ export default defineConfig(({mode}) => {
         devOptions: {
           enabled: true
         },
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+        includeAssets: ['apple-touch-icon.png'],
         manifest: {
           name: 'Aura AI - לוגיסטיקה ח. סבן',
           short_name: 'Aura ח. סבן',
@@ -39,7 +39,7 @@ export default defineConfig(({mode}) => {
               src: 'https://picsum.photos/seed/aura512/512/512',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'maskable'
             }
           ]
         },
