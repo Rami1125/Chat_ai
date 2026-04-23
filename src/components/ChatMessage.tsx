@@ -42,7 +42,7 @@ export const ChatMessage = ({ message, isLast }: ChatMessageProps) => {
           className={cn(
             "bubble px-5 py-4 text-[15px] leading-[1.5] shadow-sm",
             isBot 
-              ? "bg-white text-text-dark border border-border-color rounded-2xl rounded-bl-sm" 
+              ? "bg-sidebar-bg text-text-dark border border-border-color rounded-2xl rounded-bl-sm" 
               : "user-bubble-gradient text-white rounded-2xl rounded-br-sm"
           )}
         >
@@ -55,7 +55,7 @@ export const ChatMessage = ({ message, isLast }: ChatMessageProps) => {
                 {message.attachments.map((file, i) => (
                   <div key={i} className={cn(
                     "flex items-center gap-2 p-2 rounded-lg text-xs font-medium border",
-                    isBot ? "bg-zinc-50 border-border-color text-text-muted" : "bg-white/10 border-white/20 text-white"
+                    isBot ? "bg-bg-main border-border-color text-text-muted" : "bg-white/10 border-white/20 text-white"
                   )}>
                     {file.type.startsWith('image/') ? (
                       <div className="relative group">

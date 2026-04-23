@@ -25,14 +25,14 @@ export const SettingsModal = ({ isOpen, onClose, personality, onUpdate }: Settin
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-x-4 bottom-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-3xl shadow-2xl z-[60] overflow-hidden border border-border-color"
+            className="fixed inset-x-4 bottom-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-sidebar-bg rounded-3xl shadow-2xl z-[60] overflow-hidden border border-border-color"
           >
-            <div className="p-6 border-b border-border-color flex items-center justify-between bg-zinc-50/50">
+            <div className="p-6 border-b border-border-color flex items-center justify-between bg-bg-main/50">
               <div className="flex items-center gap-2">
                 <Settings className="w-5 h-5 text-accent" />
-                <h2 className="text-xl font-bold tracking-tight">הגדרות Aura AI</h2>
+                <h2 className="text-xl font-bold tracking-tight text-text-dark">הגדרות Aura AI</h2>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-zinc-200 rounded-full transition-colors">
+              <button onClick={onClose} className="p-2 hover:bg-bg-main rounded-full transition-colors text-text-muted">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -52,7 +52,7 @@ export const SettingsModal = ({ isOpen, onClose, personality, onUpdate }: Settin
                       className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
                         personality.persona === p 
                           ? 'bg-accent text-white shadow-md' 
-                          : 'bg-zinc-100 text-text-muted hover:bg-zinc-200'
+                          : 'bg-bg-main text-text-muted hover:bg-zinc-200 dark:hover:bg-zinc-800'
                       }`}
                     >
                       {p === 'friendly' ? 'ידידותי' : 
@@ -68,14 +68,14 @@ export const SettingsModal = ({ isOpen, onClose, personality, onUpdate }: Settin
               {/* Formality Selection */}
               <section className="space-y-3">
                 <label className="text-sm font-semibold text-text-muted">רמת פורמליות</label>
-                <div className="flex gap-2 p-1 bg-zinc-100 rounded-xl">
+                <div className="flex gap-2 p-1 bg-bg-main rounded-xl">
                   {(['casual', 'formal'] as const).map((f) => (
                     <button
                       key={f}
                       onClick={() => onUpdate({ formality: f })}
                       className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-all ${
                         personality.formality === f 
-                          ? 'bg-white shadow-sm text-accent' 
+                          ? 'bg-sidebar-bg shadow-sm text-accent' 
                           : 'text-text-muted hover:text-text-dark'
                       }`}
                     >
@@ -96,7 +96,7 @@ export const SettingsModal = ({ isOpen, onClose, personality, onUpdate }: Settin
                       className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
                         personality.length === l 
                           ? 'bg-accent text-white shadow-md' 
-                          : 'bg-zinc-100 text-text-muted hover:bg-zinc-200'
+                          : 'bg-bg-main text-text-muted hover:bg-zinc-200 dark:hover:bg-zinc-800'
                       }`}
                     >
                       {l === 'short' ? 'קצר' : l === 'standard' ? 'רגיל' : 'מפורט'}
@@ -106,10 +106,10 @@ export const SettingsModal = ({ isOpen, onClose, personality, onUpdate }: Settin
               </section>
             </div>
 
-            <div className="p-6 bg-zinc-50/50 border-t border-border-color">
+            <div className="p-6 bg-bg-main/50 border-t border-border-color">
               <button
                 onClick={onClose}
-                className="w-full py-3 bg-text-dark text-white rounded-xl font-bold hover:opacity-90 transition-all shadow-lg"
+                className="w-full py-3 bg-text-dark text-sidebar-bg rounded-xl font-bold hover:opacity-90 transition-all shadow-lg"
               >
                 שמור שינויים
               </button>

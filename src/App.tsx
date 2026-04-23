@@ -27,7 +27,9 @@ import {
   Check,
   Wifi,
   WifiOff,
-  Download
+  Download,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { ChatConversation } from './types';
 
@@ -43,6 +45,15 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sabanos_theme');
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        return 'dark';
+      }
+    }
+    return 'light';
+  });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
   const [personality, setPersonality] = useState<Personality>({
@@ -82,6 +93,15 @@ export default function App() {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('sabanos_theme', theme);
+  }, [theme]);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
@@ -311,6 +331,13 @@ export default function App() {
           <TrendingUp size={20} />
           <span>לוח הזמנות</span>
         </button>
+        <button 
+          onClick={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
+          className="w-full flex items-center gap-3 p-3 rounded-xl font-bold transition-all bg-transparent text-text-muted hover:bg-accent-light hover:text-accent"
+        >
+          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+          <span>{theme === 'light' ? 'מצב לילה' : 'מצב יום'}</span>
+        </button>
       </div>
       
       <div className="flex-1 overflow-hidden p-4 space-y-4">
@@ -333,7 +360,7 @@ export default function App() {
                   <div key={status} className="space-y-1">
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest px-2 mb-2 opacity-50 flex items-center justify-between">
                       <span>{status === 'active' ? 'שיחות פעילות' : 'ארכיון'}</span>
-                      <span className="bg-zinc-100 px-1.5 py-0.5 rounded text-[8px]">{filtered.length}</span>
+                      <span className="bg-bg-main px-1.5 py-0.5 rounded text-[8px]">{filtered.length}</span>
                     </p>
                     {filtered.length === 0 && status === 'active' ? (
                       <div className="px-2 py-4 text-center">
@@ -343,7 +370,7 @@ export default function App() {
                       filtered.map(conv => (
                         <div key={conv.id} className="group relative">
                           {editingId === conv.id ? (
-                            <div className="flex items-center gap-2 p-1 bg-white ring-1 ring-accent rounded-lg mx-1 shadow-sm">
+                            <div className="flex items-center gap-2 p-1 bg-sidebar-bg ring-1 ring-accent rounded-lg mx-1 shadow-sm">
                               <input
                                 autoFocus
                                 value={editingTitle}
@@ -352,22 +379,22 @@ export default function App() {
                                   if (e.key === 'Enter') saveTitle(conv.id);
                                   if (e.key === 'Escape') setEditingId(null);
                                 }}
-                                className="flex-1 bg-transparent text-xs p-1 outline-none font-medium"
+                                className="flex-1 bg-transparent text-xs p-1 outline-none font-medium text-text-dark"
                               />
-                              <button onClick={() => saveTitle(conv.id)} className="p-1 text-emerald-500 hover:bg-emerald-50 rounded">
+                              <button onClick={() => saveTitle(conv.id)} className="p-1 text-emerald-500 hover:bg-emerald-50/10 rounded">
                                 <Check size={14} />
                               </button>
                             </div>
                           ) : (
                             <button
                               onClick={() => selectConversation(conv.id)}
-                              className={`group w-full flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all text-right ${currentConversationId === conv.id ? 'bg-accent/10 text-accent font-bold ring-1 ring-inset ring-accent/30' : 'hover:bg-zinc-50 text-text-muted font-medium'}`}
+                              className={`group w-full flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all text-right ${currentConversationId === conv.id ? 'bg-accent/10 text-accent font-bold ring-1 ring-inset ring-accent/30' : 'hover:bg-bg-main text-text-muted font-medium'}`}
                             >
                               <div className="flex items-center gap-2 min-w-0 flex-1">
                                 <div className="relative">
                                   <MessageSquareText size={14} className={`shrink-0 ${currentConversationId === conv.id ? 'text-accent' : 'text-zinc-400'}`} />
                                   {conv.status === 'archived' && (
-                                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 border border-white rounded-full" />
+                                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 border border-sidebar-bg rounded-full" />
                                   )}
                                 </div>
                                 <span className={cn("truncate text-xs", conv.status === 'archived' && "opacity-60 italic")}>{conv.title}</span>
@@ -375,21 +402,21 @@ export default function App() {
                               <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all shrink-0">
                                 <button 
                                   onClick={(e) => renameConversation(e, conv.id, conv.title)}
-                                  className="p-1 hover:bg-zinc-100 rounded text-text-muted"
+                                  className="p-1 hover:bg-bg-main rounded text-text-muted"
                                   title="שנה שם"
                                 >
                                   <Edit2 size={12} />
                                 </button>
                                 <button 
                                   onClick={(e) => toggleArchive(e, conv.id)}
-                                  className={cn("p-1 rounded", conv.status === 'archived' ? "text-amber-500 hover:bg-amber-50" : "text-text-muted hover:bg-zinc-100")}
+                                  className={cn("p-1 rounded", conv.status === 'archived' ? "text-amber-500 hover:bg-amber-50/10" : "text-text-muted hover:bg-bg-main")}
                                   title={conv.status === 'archived' ? "הוצא מהארכיון" : "העבר לארכיון"}
                                 >
                                   <Archive size={12} />
                                 </button>
                                 <button 
                                   onClick={(e) => deleteConversation(e, conv.id)}
-                                  className="p-1 hover:bg-red-50 hover:text-red-500 rounded text-text-muted"
+                                  className="p-1 hover:bg-red-50/10 hover:text-red-500 rounded text-text-muted"
                                   title="מחק"
                                 >
                                   <Trash2 size={12} />
@@ -411,7 +438,7 @@ export default function App() {
             </div>
           </>
         ) : (
-            <div className="p-4 bg-zinc-50 rounded-2xl border border-border-color">
+            <div className="p-4 bg-bg-main rounded-2xl border border-border-color">
                 <h4 className="text-xs font-bold text-text-muted uppercase tracking-widest mb-2 opacity-50">סטטוס סטודיו</h4>
                 <p className="text-sm font-medium text-text-dark">סימולציה פעילה: אופטימיזציה של צמיחה חודשית.</p>
             </div>
@@ -419,7 +446,7 @@ export default function App() {
         
         <div className="space-y-2">
             <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest px-3 mb-1 opacity-50">אישיות Aura</p>
-            <div className="px-3 py-2 bg-zinc-50 rounded-lg text-sm text-text-dark border border-border-color flex justify-between items-center">
+            <div className="px-3 py-2 bg-bg-main rounded-lg text-sm text-text-dark border border-border-color flex justify-between items-center">
             <span className="font-medium">
                 {personality.persona === 'friendly' ? 'ידידותי' : 
                  personality.persona === 'professional' ? 'מקצועי' : 
@@ -427,7 +454,7 @@ export default function App() {
                  personality.persona === 'sarcastic' ? 'עוקצני' :
                  personality.persona === 'enthusiastic' ? 'נלהב' : 'תמציתי'}
             </span>
-            <button onClick={() => setIsSettingsOpen(true)} className="p-1 hover:bg-zinc-200 rounded text-accent">
+            <button onClick={() => setIsSettingsOpen(true)} className="p-1 hover:bg-bg-main rounded text-accent">
                 <Settings size={14} />
             </button>
             </div>
@@ -438,14 +465,14 @@ export default function App() {
         {showInstallBanner && (
           <button 
             onClick={handleInstallClick}
-            className="w-full flex items-center gap-3 p-3 rounded-xl font-bold bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-all border border-emerald-100"
+            className="w-full flex items-center gap-3 p-3 rounded-xl font-bold bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-all border border-emerald-500/20"
           >
             <Download size={20} />
             <span>התקן אפליקציה</span>
           </button>
         )}
         
-        <div className="flex items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-widest p-2 rounded-lg bg-zinc-50 border border-border-color">
+        <div className="flex items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-widest p-2 rounded-lg bg-bg-main border border-border-color">
           <div className="flex items-center gap-2">
             {isOnline ? (
               <Wifi size={12} className="text-emerald-500" />
@@ -506,7 +533,7 @@ export default function App() {
                </div>
                <button 
                  onClick={() => setIsSidebarOpen(false)}
-                 className="p-3 bg-zinc-50 border border-zinc-100 rounded-2xl text-text-muted hover:text-accent transition-all active:scale-90"
+                 className="p-3 bg-bg-main border border-border-color rounded-2xl text-text-muted hover:text-accent transition-all active:scale-90"
                >
                  <X size={24} />
                </button>
@@ -521,14 +548,14 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         {/* Header */}
-        <header className="h-16 flex items-center justify-between px-4 md:px-8 bg-white border-b border-border-color shrink-0 z-10 shadow-sm">
+        <header className="h-16 flex items-center justify-between px-4 md:px-8 bg-sidebar-bg border-b border-border-color shrink-0 z-10 shadow-sm">
           <div className="flex items-center gap-3">
             {/* Burger Menu Button - Advanced Design */}
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="md:hidden p-2.5 bg-zinc-50 border border-border-color rounded-xl text-text-dark transition-all shadow-sm"
+              className="md:hidden p-2.5 bg-bg-main border border-border-color rounded-xl text-text-dark transition-all shadow-sm"
             >
               {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </motion.button>
@@ -556,7 +583,7 @@ export default function App() {
               whileHover={{ scale: 1.1, rotate: 15 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsSettingsOpen(true)}
-              className="p-2 hover:bg-zinc-50 rounded-lg text-text-muted hover:text-accent transition-colors"
+              className="p-2 hover:bg-bg-main rounded-lg text-text-muted hover:text-accent transition-colors"
               title="הגדרות"
             >
               <Settings size={18} />
@@ -566,7 +593,7 @@ export default function App() {
                     whileHover={{ scale: 1.1, rotate: -15 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={clearChat}
-                    className="p-2 hover:bg-red-50 rounded-lg text-text-muted hover:text-red-500 transition-colors"
+                    className="p-2 hover:bg-red-50/10 rounded-lg text-text-muted hover:text-red-500 transition-colors"
                     title="מחק הכל"
                 >
                     <RotateCcw size={18} />
@@ -596,7 +623,7 @@ export default function App() {
                         exit={{ opacity: 0 }}
                         className="h-full flex flex-col items-center justify-center py-12 text-center"
                         >
-                        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-border-color">
+                        <div className="w-16 h-16 bg-sidebar-bg rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-border-color">
                             <Orbit className="h-8 w-8 text-accent" />
                         </div>
                         <h2 className="text-3xl font-bold tracking-tight mb-3 text-text-dark tracking-tighter">נועה - SabanOS</h2>
@@ -614,7 +641,7 @@ export default function App() {
                             <button
                                 key={i}
                                 onClick={() => handleSend(text)}
-                                className="px-4 py-2 bg-white hover:bg-accent-light hover:text-accent border border-border-color rounded-full text-sm font-medium transition-all shadow-sm"
+                                className="px-4 py-2 bg-sidebar-bg hover:bg-accent-light hover:text-accent border border-border-color rounded-full text-sm font-medium transition-all shadow-sm text-text-dark"
                             >
                                 {text}
                             </button>
@@ -636,9 +663,9 @@ export default function App() {
                             initial={{ opacity: 0, y: 10, scale: 0.9 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="self-end mb-6"
+                            className="self-start mb-6"
                           >
-                            <div className="bg-white border border-border-color px-5 py-4 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-3">
+                            <div className="bg-sidebar-bg border border-border-color px-5 py-4 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-3">
                               <div className="flex gap-1.5 py-1">
                                 {[0, 1, 2].map((i) => (
                                   <motion.div

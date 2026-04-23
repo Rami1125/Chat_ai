@@ -196,23 +196,23 @@ export const OrdersBoard = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#f8fafc] text-[#1e293b] font-sans overflow-hidden" dir="rtl">
+    <div className="flex flex-col h-full bg-bg-main text-text-dark font-sans overflow-hidden" dir="rtl">
       {/* Top Header - Global Tools */}
-      <header className="bg-white border-b border-zinc-200 px-4 md:px-8 py-3 md:py-4 flex items-center justify-between shrink-0">
+      <header className="bg-sidebar-bg border-b border-border-color px-4 md:px-8 py-3 md:py-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3 md:gap-4">
           <div className="w-10 h-10 md:w-12 md:h-12 bg-accent rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-lg shadow-accent/20 shrink-0">
             <TrendingUp size={20} className="md:w-6 md:h-6" />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg md:text-2xl font-black tracking-tighter truncate">SabanOS - לוח הפצה</h1>
-            <div className="hidden sm:flex items-center gap-2 text-[10px] md:text-xs font-bold text-zinc-400">
+            <div className="hidden sm:flex items-center gap-2 text-[10px] md:text-xs font-bold text-text-muted">
               <Clock size={12} />
               <span className="truncate">עדכון: {new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}</span>
-              <span className="w-1 h-1 bg-zinc-300 rounded-full shrink-0" />
+              <span className="w-1 h-1 bg-border-color rounded-full shrink-0" />
               <span>{filteredRounds.length} פריטים</span>
               {isSyncing && (
                 <>
-                  <span className="w-1 h-1 bg-zinc-300 rounded-full shrink-0" />
+                  <span className="w-1 h-1 bg-border-color rounded-full shrink-0" />
                   <span className="text-accent animate-pulse">סנכרון פעיל...</span>
                 </>
               )}
@@ -221,7 +221,7 @@ export const OrdersBoard = () => {
         </div>
 
         <div className="flex items-center gap-2 md:gap-3">
-          <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-bold hover:bg-zinc-50 transition-all shadow-sm">
+          <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-sidebar-bg border border-border-color rounded-xl text-xs font-bold hover:bg-bg-main transition-all shadow-sm">
             <Share2 size={16} className="text-accent" />
             <span>שתף דוח</span>
           </button>
@@ -238,28 +238,28 @@ export const OrdersBoard = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden lg:flex-row flex-col">
         {/* Right Sidebar - Stats & Tools (Hidden on Mobile) */}
-        <aside className="hidden lg:flex w-80 border-l border-zinc-200 bg-white overflow-y-auto p-6 space-y-8 shrink-0">
+        <aside className="hidden lg:flex w-80 border-l border-border-color bg-sidebar-bg overflow-y-auto p-6 space-y-8 shrink-0">
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-blue-50/50 p-4 rounded-3xl border border-blue-100">
+            <div className="bg-blue-500/10 dark:bg-blue-900/10 p-4 rounded-3xl border border-blue-500/20">
               <div className="text-blue-600 mb-1"><Truck size={20} /></div>
-              <div className="text-2xl font-black text-blue-700">{stats.inTransit}</div>
+              <div className="text-2xl font-black text-blue-700 dark:text-blue-400">{stats.inTransit}</div>
               <div className="text-[10px] font-bold text-blue-500 uppercase">בדרך ליעד</div>
             </div>
-            <div className="bg-emerald-50/50 p-4 rounded-3xl border border-emerald-100">
+            <div className="bg-emerald-500/10 dark:bg-emerald-900/10 p-4 rounded-3xl border border-emerald-500/20">
               <div className="text-emerald-600 mb-1"><CheckCircle2 size={20} /></div>
-              <div className="text-2xl font-black text-emerald-700">{stats.completed}</div>
+              <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{stats.completed}</div>
               <div className="text-[10px] font-bold text-emerald-500 uppercase">הושלמו</div>
             </div>
-            <div className="bg-amber-50/50 p-4 rounded-3xl border border-amber-100">
+            <div className="bg-amber-500/10 dark:bg-amber-900/10 p-4 rounded-3xl border border-amber-500/20">
               <div className="text-amber-600 mb-1"><Clock size={20} /></div>
-              <div className="text-2xl font-black text-amber-700">{stats.pending}</div>
+              <div className="text-2xl font-black text-amber-700 dark:text-amber-400">{stats.pending}</div>
               <div className="text-[10px] font-bold text-amber-500 uppercase">ממתינים</div>
             </div>
-            <div className="bg-zinc-50/50 p-4 rounded-3xl border border-zinc-100">
-              <div className="text-zinc-600 mb-1"><Users size={20} /></div>
-              <div className="text-2xl font-black text-zinc-700">{stats.activeDrivers}</div>
-              <div className="text-[10px] font-bold text-zinc-500 uppercase">נהגים פעילים</div>
+            <div className="bg-bg-main p-4 rounded-3xl border border-border-color">
+              <div className="text-text-muted mb-1"><Users size={20} /></div>
+              <div className="text-2xl font-black text-text-dark">{stats.activeDrivers}</div>
+              <div className="text-[10px] font-bold text-text-muted uppercase">נהגים פעילים</div>
             </div>
           </div>
 
@@ -267,13 +267,13 @@ export const OrdersBoard = () => {
           <div>
             <h3 className="text-sm font-black mb-4 flex items-center justify-between">
               <span>סטטוס נהגים</span>
-              <span className="text-[10px] bg-zinc-100 px-2 py-0.5 rounded-full text-zinc-500">חי</span>
+              <span className="text-[10px] bg-bg-main px-2 py-0.5 rounded-full text-text-muted">חי</span>
             </h3>
             <div className="space-y-3">
               {['חכמת', 'עלי'].map((driver) => (
-                <div key={driver} className="flex items-center justify-between p-3 rounded-2xl bg-zinc-50 border border-zinc-100">
+                <div key={driver} className="flex items-center justify-between p-3 rounded-2xl bg-bg-main border border-border-color">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-lg">
+                    <div className="w-10 h-10 bg-sidebar-bg rounded-xl flex items-center justify-center shadow-sm text-lg border border-border-color">
                       {driver === 'חכמת' ? '🏗️' : driver === 'עלי' ? '🚛' : '🚐'}
                     </div>
                     <div>
@@ -301,13 +301,13 @@ export const OrdersBoard = () => {
               התראות דחופות
             </h3>
             <div className="space-y-3">
-              <div className="bg-rose-50 p-3 rounded-2xl border border-rose-100 border-r-4 border-r-rose-500">
-                <p className="text-[11px] font-bold text-rose-700">חסר מלאי: בטון ב-30</p>
-                <p className="text-[10px] text-rose-600 opacity-80 leading-relaxed">משלוח "זבולון" מעוכב - ממתינים למערבל מהמרכזי.</p>
+              <div className="bg-rose-50/10 dark:bg-rose-900/10 p-3 rounded-2xl border border-rose-100 dark:border-rose-900/20 border-r-4 border-r-rose-500">
+                <p className="text-[11px] font-bold text-rose-700 dark:text-rose-400">חסר מלאי: בטון ב-30</p>
+                <p className="text-[10px] text-rose-600 dark:text-rose-500 opacity-80 leading-relaxed">משלוח "זבולון" מעוכב - ממתינים למערבל מהמרכזי.</p>
               </div>
-              <div className="bg-amber-50 p-3 rounded-2xl border border-amber-100 border-r-4 border-r-amber-500">
-                <p className="text-[11px] font-bold text-amber-700">נהג "עלי" - חריגה</p>
-                <p className="text-[10px] text-amber-600 opacity-80 leading-relaxed">זמן העמסה מעל 45 דק' באתר מרכזי.</p>
+              <div className="bg-amber-50/10 dark:bg-amber-900/10 p-3 rounded-2xl border border-amber-100 dark:border-amber-900/20 border-r-4 border-r-amber-500">
+                <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400">נהג "עלי" - חריגה</p>
+                <p className="text-[10px] text-amber-600 dark:text-amber-500 opacity-80 leading-relaxed">זמן העמסה מעל 45 דק' באתר מרכזי.</p>
               </div>
             </div>
           </div>
@@ -324,10 +324,10 @@ export const OrdersBoard = () => {
               { label: 'נהגים', count: stats.activeDrivers, color: 'purple' }
             ].map(stat => (
               <div key={stat.label} className={cn("px-4 py-2 rounded-2xl border shrink-0 flex items-center gap-2", 
-                stat.color === 'blue' ? "bg-blue-50 border-blue-100 text-blue-700" :
-                stat.color === 'emerald' ? "bg-emerald-50 border-emerald-100 text-emerald-700" :
-                stat.color === 'amber' ? "bg-amber-50 border-amber-100 text-amber-700" :
-                "bg-purple-50 border-purple-100 text-purple-700"
+                stat.color === 'blue' ? "bg-blue-50/20 border-blue-100 dark:border-blue-900/30 text-blue-700 dark:text-blue-400" :
+                stat.color === 'emerald' ? "bg-emerald-50/20 border-emerald-100 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400" :
+                stat.color === 'amber' ? "bg-amber-50/20 border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400" :
+                "bg-purple-50/20 border-purple-100 dark:border-purple-900/30 text-purple-700 dark:text-purple-400"
               )}>
                 <span className="text-[10px] font-black uppercase tracking-wider">{stat.label}</span>
                 <span className="font-black text-sm">{stat.count}</span>
@@ -351,8 +351,8 @@ export const OrdersBoard = () => {
                   key={alert.id}
                   className={cn(
                     "flex items-center gap-4 p-4 rounded-3xl border min-w-[300px] shrink-0 transition-all hover:scale-[1.02] cursor-pointer shadow-sm",
-                    alert.color === 'rose' ? "bg-rose-50 border-rose-100" :
-                    alert.color === 'amber' ? "bg-amber-50 border-amber-100" : "bg-blue-50 border-blue-100"
+                    alert.color === 'rose' ? "bg-rose-500/10 border-rose-500/20" :
+                    alert.color === 'amber' ? "bg-amber-500/10 border-amber-500/20" : "bg-blue-500/10 border-blue-500/20"
                   )}
                 >
                   <div className={cn(
@@ -380,16 +380,16 @@ export const OrdersBoard = () => {
           </div>
 
           {/* Controls & Filter Bar */}
-          <div className="bg-white p-4 md:p-5 rounded-3xl md:rounded-[2.5rem] border border-zinc-200 shadow-sm space-y-4">
+          <div className="bg-sidebar-bg p-4 md:p-5 rounded-3xl md:rounded-[2.5rem] border border-border-color shadow-sm space-y-4">
             <div className="flex flex-col gap-4">
               <div className="relative flex-1 group">
-                <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-accent transition-colors" />
+                <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-accent transition-colors" />
                 <input 
                   type="text"
                   placeholder="חיפוש לקוח, נהג, כתובת..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl py-3 pr-12 pl-4 text-sm outline-none focus:ring-4 focus:ring-accent/10 focus:bg-white transition-all font-medium"
+                  className="w-full bg-bg-main border border-border-color rounded-2xl py-3 pr-12 pl-4 text-sm outline-none focus:ring-4 focus:ring-accent/10 focus:bg-sidebar-bg text-text-dark transition-all font-medium"
                 />
               </div>
               
@@ -398,41 +398,41 @@ export const OrdersBoard = () => {
                   <select 
                     value={driverFilter}
                     onChange={(e) => setDriverFilter(e.target.value)}
-                    className="w-full appearance-none bg-zinc-50 border border-zinc-100 rounded-2xl py-3 pr-4 pl-10 text-xs font-black outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer hover:bg-white transition-all sm:min-w-[120px]"
+                    className="w-full appearance-none bg-bg-main border border-border-color rounded-2xl py-3 pr-4 pl-10 text-xs font-black outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer hover:bg-sidebar-bg text-text-dark transition-all sm:min-w-[120px]"
                   >
                     <option value="all">כל הנהגים</option>
                     <option value="חכמת">חכמת</option>
                     <option value="עלי">עלי</option>
                   </select>
-                  <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+                  <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
                 </div>
 
                 <div className="relative col-span-1">
                   <select 
                     value={warehouseFilter}
                     onChange={(e) => setWarehouseFilter(e.target.value)}
-                    className="w-full appearance-none bg-zinc-50 border border-zinc-100 rounded-2xl py-3 pr-4 pl-10 text-xs font-black outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer hover:bg-white transition-all sm:min-w-[120px]"
+                    className="w-full appearance-none bg-bg-main border border-border-color rounded-2xl py-3 pr-4 pl-10 text-xs font-black outline-none focus:ring-4 focus:ring-accent/10 cursor-pointer hover:bg-sidebar-bg text-text-dark transition-all sm:min-w-[120px]"
                   >
                     <option value="all">כל המחסנים</option>
                     <option value="החרש">החרש</option>
                     <option value="התלמיד">התלמיד</option>
                   </select>
-                  <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+                  <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
                 </div>
                 
                 <div className="relative col-span-2 sm:col-auto">
-                    <button className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-2xl text-[10px] font-black uppercase tracking-wider hover:bg-zinc-100 transition-all">
+                    <button className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-bg-main border border-border-color rounded-2xl text-[10px] font-black uppercase tracking-wider hover:bg-sidebar-bg transition-all text-text-dark">
                         <span className="flex items-center gap-2">
                            <Calendar size={14} className="text-accent" />
                            {startDate ? `${startDate} - ${endDate}` : 'כל התאריכים'}
                         </span>
-                        <ChevronDown size={14} className="text-zinc-400" />
+                        <ChevronDown size={14} className="text-text-muted" />
                     </button>
                 </div>
 
                 <button 
                   onClick={() => setIsColorModalOpen(true)}
-                  className="col-span-2 sm:col-auto flex items-center justify-center gap-2 px-4 py-3 bg-white border border-zinc-200 rounded-2xl text-[10px] font-black uppercase tracking-wider hover:bg-zinc-50 transition-all text-accent"
+                  className="col-span-2 sm:col-auto flex items-center justify-center gap-2 px-4 py-3 bg-sidebar-bg border border-border-color rounded-2xl text-[10px] font-black uppercase tracking-wider hover:bg-bg-main transition-all text-accent"
                 >
                   <Palette size={14} />
                   <span>צבעי סטטוס</span>
@@ -444,11 +444,11 @@ export const OrdersBoard = () => {
           {/* Orders Display - Responsive Table/Cards */}
           <div className="space-y-4">
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-[2.5rem] border border-zinc-200 shadow-xl shadow-zinc-200/50 overflow-hidden">
+            <div className="hidden md:block bg-sidebar-bg rounded-[2.5rem] border border-border-color shadow-xl shadow-bg-main overflow-hidden">
               <div className="overflow-x-auto overflow-y-auto max-h-[600px] no-scrollbar">
                 <table className="w-full text-right border-collapse">
-                  <thead className="sticky top-0 bg-white z-10 border-b-2 border-zinc-50">
-                    <tr className="text-[10px] font-black text-zinc-400 tracking-[0.2em] uppercase">
+                  <thead className="sticky top-0 bg-sidebar-bg z-10 border-b-2 border-bg-main">
+                    <tr className="text-[10px] font-black text-text-muted tracking-[0.2em] uppercase">
                       <th className="px-8 py-6">תעדוף</th>
                       <th className="px-6 py-6 text-center">זמן ונהג</th>
                       <th className="px-6 py-6">לקוח ויעד</th>
@@ -457,7 +457,7 @@ export const OrdersBoard = () => {
                       <th className="px-8 py-6"></th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-50">
+                  <tbody className="divide-y divide-bg-main">
                     <AnimatePresence mode="popLayout">
                       {filteredRounds.length > 0 ? (
                         filteredRounds.map((round, idx) => (
@@ -468,7 +468,7 @@ export const OrdersBoard = () => {
                             exit={{ opacity: 0, scale: 0.98 }}
                             transition={{ delay: 0.03 * idx }}
                             key={round.id}
-                            className="hover:bg-zinc-50/70 transition-all group"
+                            className="hover:bg-bg-main transition-all group"
                           >
                             <td className="px-8 py-5">
                               <div className={cn(
@@ -479,9 +479,9 @@ export const OrdersBoard = () => {
                             </td>
                             <td className="px-6 py-5">
                               <div className="flex flex-col items-center gap-1">
-                                <span className="text-sm font-black text-[#1e293b]">{round.time}</span>
-                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-zinc-100 rounded-full">
-                                  <span className="text-[9px] font-bold text-zinc-500">{round.driver}</span>
+                                <span className="text-sm font-black text-text-dark">{round.time}</span>
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-bg-main rounded-full">
+                                  <span className="text-[9px] font-bold text-text-muted">{round.driver}</span>
                                   {round.status === 'בדרך' && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />}
                                   {round.priority === 'high' && round.status !== 'בוצע' && (
                                     <AlertCircle size={10} className="text-rose-500 animate-pulse" />
@@ -491,20 +491,20 @@ export const OrdersBoard = () => {
                             </td>
                             <td className="px-6 py-5 min-w-[180px]">
                               <div className="flex items-center gap-2 mb-1">
-                                  <p className="text-sm font-black">{round.customer}</p>
-                                  <span className="text-[9px] px-1.5 py-0.5 bg-zinc-100 text-zinc-500 rounded font-bold uppercase tracking-tighter">
+                                  <p className="text-sm font-black text-text-dark">{round.customer}</p>
+                                  <span className="text-[9px] px-1.5 py-0.5 bg-bg-main text-text-muted rounded font-bold uppercase tracking-tighter">
                                       מחסן {round.warehouse}
                                   </span>
                               </div>
-                              <div className="flex items-center gap-1 text-[11px] text-zinc-400 font-bold group/loc cursor-pointer hover:text-accent transition-colors" onClick={() => setSelectedOrderForMap(round)}>
+                              <div className="flex items-center gap-1 text-[11px] text-text-muted font-bold group/loc cursor-pointer hover:text-accent transition-colors" onClick={() => setSelectedOrderForMap(round)}>
                                 <MapPin size={10} className="text-accent" />
-                                <span className="border-b border-dotted border-zinc-200 group-hover/loc:border-accent">
+                                <span className="border-b border-dotted border-border-color group-hover/loc:border-accent">
                                   {round.destination}
                                 </span>
                               </div>
                             </td>
                             <td className="px-6 py-5">
-                              <p className="text-[11px] font-bold text-zinc-500 leading-relaxed max-w-[200px]">
+                              <p className="text-[11px] font-bold text-text-muted leading-relaxed max-w-[200px]">
                                 {round.items}
                               </p>
                             </td>
@@ -523,7 +523,7 @@ export const OrdersBoard = () => {
                                 >
                                   {round.status}
                                 </button>
-                                <div className="w-full bg-zinc-100 h-1 rounded-full overflow-hidden">
+                                <div className="w-full bg-bg-main h-1 rounded-full overflow-hidden">
                                   <motion.div 
                                     initial={{ width: 0 }}
                                     animate={{ width: round.status === 'בוצע' ? '100%' : round.status === 'בדרך' ? '70%' : round.status === 'העמסה' ? '30%' : '10%' }}
@@ -539,15 +539,15 @@ export const OrdersBoard = () => {
                               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button 
                                   onClick={() => handleWhatsAppShare(round)}
-                                  className="p-2 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 rounded-xl text-emerald-600 transition-all"
+                                  className="p-2 hover:bg-emerald-50/10 rounded-xl text-emerald-600 transition-all"
                                   title="שתף בוואטסאפ"
                                 >
                                   <MessageCircle size={16} />
                                 </button>
-                                <button className="p-2 hover:bg-white hover:shadow-md border border-transparent hover:border-zinc-100 rounded-xl text-zinc-400 hover:text-accent transition-all">
+                                <button className="p-2 hover:bg-sidebar-bg hover:shadow-md border border-transparent hover:border-border-color rounded-xl text-text-muted hover:text-accent transition-all">
                                   <Edit2 size={16} />
                                 </button>
-                                <button className="p-2 hover:bg-white hover:shadow-md border border-transparent hover:border-zinc-100 rounded-xl text-zinc-400 hover:text-zinc-600 transition-all">
+                                <button className="p-2 hover:bg-sidebar-bg hover:shadow-md border border-transparent hover:border-border-color rounded-xl text-text-muted hover:text-text-dark transition-all">
                                   <MoreVertical size={16} />
                                 </button>
                               </div>
@@ -558,8 +558,8 @@ export const OrdersBoard = () => {
                         <tr>
                           <td colSpan={6} className="px-8 py-24 text-center">
                             <div className="flex flex-col items-center gap-4 opacity-40">
-                              <Box size={48} className="text-zinc-300" />
-                              <p className="text-lg font-black text-zinc-500">אין הזמנות תואמות לסינון</p>
+                              <Box size={48} className="text-text-muted opacity-30" />
+                              <p className="text-lg font-black text-text-muted">אין הזמנות תואמות לסינון</p>
                             </div>
                           </td>
                         </tr>
@@ -578,7 +578,7 @@ export const OrdersBoard = () => {
                   layout
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-3xl border border-zinc-200 p-5 shadow-sm space-y-4 relative overflow-hidden"
+                  className="bg-sidebar-bg rounded-3xl border border-border-color p-5 shadow-sm space-y-4 relative overflow-hidden"
                 >
                   {/* Status Accent Strip */}
                   <div className={cn("absolute top-0 right-0 bottom-0 w-1.5", 
@@ -588,12 +588,12 @@ export const OrdersBoard = () => {
 
                   <div className="flex items-start justify-between">
                     <div className="flex gap-3">
-                      <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center text-xl shadow-inner border border-zinc-100">
+                      <div className="w-12 h-12 bg-bg-main rounded-2xl flex items-center justify-center text-xl shadow-inner border border-border-color">
                         {round.driver === 'חכמת' ? '🏗️' : '🚛'}
                       </div>
                       <div className="min-w-0">
-                        <h3 className="text-sm font-black truncate">{round.customer}</h3>
-                        <p className="text-[10px] font-bold text-zinc-400 italic">#{round.id} • {round.time}</p>
+                        <h3 className="text-sm font-black truncate text-text-dark">{round.customer}</h3>
+                        <p className="text-[10px] font-bold text-text-muted italic">#{round.id} • {round.time}</p>
                       </div>
                     </div>
                     <button 
@@ -609,35 +609,35 @@ export const OrdersBoard = () => {
                   </div>
 
                   <div className="space-y-2.5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-zinc-600 font-sans">
+                    <div className="flex items-center gap-2 text-xs font-bold text-text-muted font-sans">
                       <MapPin size={14} className="text-accent shrink-0" />
                       <button 
                         onClick={() => setSelectedOrderForMap(round)}
-                        className="text-right border-b border-dotted border-zinc-300 transition-colors active:text-accent"
+                        className="text-right border-b border-dotted border-border-color transition-colors active:text-accent"
                       >
                         {round.destination}
                       </button>
                     </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-zinc-600 bg-zinc-50 p-2.5 rounded-xl border border-zinc-100">
-                      <Package size={14} className="text-zinc-400 shrink-0" />
+                    <div className="flex items-center gap-2 text-xs font-bold text-text-muted bg-bg-main p-2.5 rounded-xl border border-border-color">
+                      <Package size={14} className="text-text-muted shrink-0" />
                       <span className="truncate">{round.items}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-zinc-100">
+                  <div className="flex items-center justify-between pt-2 border-t border-border-color">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center text-[10px] font-black text-accent">
                         {round.warehouse[0]}
                       </div>
-                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">מחסן {round.warehouse}</span>
+                      <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">מחסן {round.warehouse}</span>
                     </div>
                     <div className="flex gap-2">
-                      <button className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all active:scale-90">
+                      <button className="p-2.5 bg-blue-50/10 text-blue-600 rounded-xl hover:bg-blue-100 transition-all active:scale-90">
                         <Phone size={14} />
                       </button>
                       <button 
                         onClick={() => handleWhatsAppShare(round)}
-                        className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-all active:scale-90"
+                        className="p-2.5 bg-emerald-50/10 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-all active:scale-90"
                       >
                         <MessageCircle size={14} />
                       </button>
@@ -646,8 +646,8 @@ export const OrdersBoard = () => {
                 </motion.div>
               ))}
               {filteredRounds.length === 0 && (
-                <div className="text-center py-20 bg-zinc-50 rounded-[3rem] border border-dashed border-zinc-200">
-                  <p className="text-zinc-400 font-bold">לא נמצאו הזמנות</p>
+                <div className="text-center py-20 bg-bg-main rounded-[3rem] border border-dashed border-border-color">
+                  <p className="text-text-muted font-bold">לא נמצאו הזמנות</p>
                 </div>
               )}
             </div>
@@ -670,29 +670,29 @@ export const OrdersBoard = () => {
               initial={{ scale: 0.9, opacity: 0, y: 100 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 100 }}
-              className="relative bg-white w-full max-w-4xl h-[80vh] rounded-[3rem] shadow-2xl border border-zinc-200 overflow-hidden flex flex-col"
+              className="relative bg-sidebar-bg w-full max-w-4xl h-[80vh] rounded-[3rem] shadow-2xl border border-border-color overflow-hidden flex flex-col"
             >
               {/* Modal Header */}
-              <div className="p-8 border-b border-zinc-100 flex items-center justify-between shrink-0 bg-white z-10">
+              <div className="p-8 border-b border-border-color flex items-center justify-between shrink-0 bg-sidebar-bg z-10">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center text-accent">
                     <MapPin size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black tracking-tight">{selectedOrderForMap.customer}</h3>
-                    <p className="text-xs font-bold text-zinc-400">{selectedOrderForMap.destination}</p>
+                    <h3 className="text-xl font-black tracking-tight text-text-dark">{selectedOrderForMap.customer}</h3>
+                    <p className="text-xs font-bold text-text-muted">{selectedOrderForMap.destination}</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setSelectedOrderForMap(null)}
-                  className="p-3 hover:bg-zinc-100 rounded-2xl text-zinc-400 transition-all active:scale-90"
+                  className="p-3 hover:bg-bg-main rounded-2xl text-text-muted transition-all active:scale-90"
                 >
                   <X size={24} />
                 </button>
               </div>
 
               {/* Map Container Area */}
-              <div className="flex-1 relative bg-zinc-100">
+              <div className="flex-1 relative bg-bg-main">
                 <MapContainer 
                   center={[selectedOrderForMap.coords.lat, selectedOrderForMap.coords.lng]} 
                   zoom={13} 
@@ -706,9 +706,9 @@ export const OrdersBoard = () => {
                   <Marker position={[selectedOrderForMap.coords.lat, selectedOrderForMap.coords.lng]}>
                     <Popup>
                       <div className="p-1" dir="rtl">
-                        <p className="font-bold text-sm mb-1">{selectedOrderForMap.customer}</p>
-                        <p className="text-xs text-zinc-500">{selectedOrderForMap.items}</p>
-                        <p className="text-[10px] bg-zinc-100 px-2 py-0.5 rounded mt-2 inline-block font-bold">
+                        <p className="font-bold text-sm mb-1 text-text-dark">{selectedOrderForMap.customer}</p>
+                        <p className="text-xs text-text-muted">{selectedOrderForMap.items}</p>
+                        <p className="text-[10px] bg-bg-main px-2 py-0.5 rounded mt-2 inline-block font-bold text-text-dark">
                           {selectedOrderForMap.driver} • {selectedOrderForMap.time}
                         </p>
                       </div>
@@ -719,11 +719,11 @@ export const OrdersBoard = () => {
 
                 {/* Quick Info Overlay */}
                 <div className="absolute bottom-6 right-6 left-6 z-[1000] flex gap-3 pointer-events-none">
-                  <div className="bg-white/95 backdrop-blur-sm p-5 rounded-3xl border border-white/20 shadow-xl flex-1 pointer-events-auto">
+                  <div className="bg-sidebar-bg/95 backdrop-blur-sm p-5 rounded-3xl border border-border-color shadow-xl flex-1 pointer-events-auto">
                     <div className="flex items-center justify-between">
                        <div className="space-y-1">
-                          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">משימה נוכחית</p>
-                          <p className="text-sm font-black text-zinc-900">{selectedOrderForMap.items}</p>
+                          <p className="text-[10px] font-black text-text-muted uppercase tracking-widest">משימה נוכחית</p>
+                          <p className="text-sm font-black text-text-dark">{selectedOrderForMap.items}</p>
                        </div>
                        <button className="px-5 py-2.5 bg-accent text-white rounded-2xl text-xs font-black shadow-lg shadow-accent/30 hover:bg-accent-dark transition-all active:scale-95">
                           פתח בניווט (Waze)

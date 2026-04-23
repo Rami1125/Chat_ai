@@ -38,7 +38,7 @@ export function ReloadPrompt() {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
-          className="fixed bottom-6 right-6 z-[60] p-4 bg-white rounded-3xl shadow-2xl border border-border-color flex flex-col gap-3 min-w-[280px]"
+          className="fixed bottom-6 right-6 z-[60] p-4 bg-sidebar-bg rounded-3xl shadow-2xl border border-border-color flex flex-col gap-3 min-w-[280px]"
         >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
@@ -54,7 +54,7 @@ export function ReloadPrompt() {
                 </p>
               </div>
             </div>
-            <button onClick={close} className="p-1 text-text-muted hover:bg-zinc-100 rounded-lg">
+            <button onClick={close} className="p-1 text-text-muted hover:bg-bg-main rounded-lg">
               <X size={16} />
             </button>
           </div>

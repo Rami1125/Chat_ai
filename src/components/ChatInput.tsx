@@ -139,7 +139,7 @@ export const ChatInput = ({ onSend, isLoading, onNewChat }: ChatInputProps) => {
   const isHebrew = /[\u0590-\u05FF]/.test(input);
 
   return (
-    <div className="p-6 bg-white border-t border-border-color sticky bottom-0 z-20">
+    <div className="p-6 bg-sidebar-bg border-t border-border-color sticky bottom-0 z-20">
       <div className="max-w-4xl mx-auto mb-2 flex flex-wrap gap-2">
         <AnimatePresence>
           {attachments.map((file, i) => (
@@ -181,7 +181,7 @@ export const ChatInput = ({ onSend, isLoading, onNewChat }: ChatInputProps) => {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading || isRecording || isTranscribing}
-          className="shrink-0 p-3 text-text-muted hover:text-accent hover:bg-zinc-100 rounded-lg transition-all"
+          className="shrink-0 p-3 text-text-muted hover:text-accent hover:bg-bg-main rounded-lg transition-all"
           title="צרף קובץ"
         >
           <Paperclip size={20} />
@@ -195,8 +195,8 @@ export const ChatInput = ({ onSend, isLoading, onNewChat }: ChatInputProps) => {
           className={cn(
             "shrink-0 p-3 transition-all rounded-lg",
             isRecording 
-              ? "text-red-500 bg-red-50 animate-pulse" 
-              : "text-text-muted hover:text-accent hover:bg-zinc-100"
+              ? "text-red-500 bg-red-50/10 animate-pulse" 
+              : "text-text-muted hover:text-accent hover:bg-bg-main"
           )}
           title={isRecording ? "עצור הקלטה" : "הקלט הודעה קולית"}
         >
@@ -258,27 +258,27 @@ export const ChatInput = ({ onSend, isLoading, onNewChat }: ChatInputProps) => {
           whileHover={{ y: -2, backgroundColor: '#f4f4f5' }}
           whileTap={{ scale: 0.98 }}
           onClick={onNewChat}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border-color text-[11px] font-bold text-text-muted transition-all whitespace-nowrap bg-white shadow-sm"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border-color text-[11px] font-bold text-text-muted transition-all whitespace-nowrap bg-sidebar-bg shadow-sm"
         >
           <PlusCircle size={14} className="text-accent" />
           שיחה חדשה
         </motion.button>
         <motion.button
-          whileHover={{ y: -2, backgroundColor: '#f4f4f5' }}
+          whileHover={{ y: -2, backgroundColor: 'var(--bg-main)' }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onSend("סכמי לי את המצב של כל הנהגים נכון לעכשיו.", [])}
           disabled={isLoading}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border-color text-[11px] font-bold text-text-muted transition-all whitespace-nowrap bg-white shadow-sm disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border-color text-[11px] font-bold text-text-muted transition-all whitespace-nowrap bg-sidebar-bg shadow-sm disabled:opacity-50"
         >
           <ListChecks size={14} className="text-emerald-500" />
           סטטוס נהגים
         </motion.button>
         <motion.button
-          whileHover={{ y: -2, backgroundColor: '#f4f4f5' }}
+          whileHover={{ y: -2, backgroundColor: 'var(--bg-main)' }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onSend("מה חוקי המלאי לגבי בטון וריצופית?", [])}
           disabled={isLoading}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border-color text-[11px] font-bold text-text-muted transition-all whitespace-nowrap bg-white shadow-sm disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border-color text-[11px] font-bold text-text-muted transition-all whitespace-nowrap bg-sidebar-bg shadow-sm disabled:opacity-50"
         >
           <Sparkles size={14} className="text-amber-500" />
           חוקי הזמנה
